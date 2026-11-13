@@ -586,8 +586,8 @@ const getStageCodeLabel = (stageCode) => {
     XII: '代号XII 2.0',
     'HJ-C': '幻镜-C版',
     ITL: 'INTO THE LIGHT',
-    '48Hz': '48Hz',
     11: '1&1 Anyone',
+    '48Hz': '48Hz',
     SJHS: '三角函数',
     FX: 'Fire X',
     SP: '其它（特殊公演或非公演）'
@@ -701,8 +701,8 @@ const canShowLiveButton = (startDateLike) => {
             <option value="XII">代号XII 2.0</option>
             <option value="HJ-C">幻镜-C版</option>
             <option value="ITL">INTO THE LIGHT</option>
-            <option value="48Hz">48Hz</option>
             <option value="11">1&amp;1 Anyone</option>
+            <option value="48Hz">48Hz</option>
             <option value="SJHS">三角函数</option>
             <option value="FX">Fire X</option>
             <option value="SP">其它（特殊公演或非公演）</option>
@@ -983,8 +983,8 @@ const canShowLiveButton = (startDateLike) => {
               <option value="XII">代号XII 2.0</option>
               <option value="HJ-C">幻镜-C版</option>
               <option value="ITL">INTO THE LIGHT</option>
-              <option value="48Hz">48Hz</option>
               <option value="11">1&amp;1 Anyone</option>
+              <option value="48Hz">48Hz</option>
               <option value="SJHS">三角函数</option>
               <option value="FX">Fire X</option>
               <option value="SP">其它（特殊公演或非公演）</option>

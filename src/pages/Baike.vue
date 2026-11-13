@@ -188,13 +188,13 @@ const { isMobile, isSidebarCollapsed } = useResponsiveSidebar()
               <i class="fas fa-theater-masks text-warning me-2"></i>《命运的X号》新生公演（2023.05.02 - 2024.04.24）
             </p>
             <p class="mb-3 p-0">
-              <i class="fas fa-theater-masks text-primary me-2"></i>Team SII《幻镜》B版公演（2023.05.26 - 2025.02.16）
+              <i class="fas fa-theater-masks text-primary me-2"></i>Team SII《幻镜-B版》公演（2023.05.26 - 2025.02.16）
             </p>
             <p class="mb-3 p-0">
               <i class="fas fa-theater-masks text-warning me-2"></i>《代号XII 2.0》新生公演（2024.05.05 - 2025.03.12）
             </p>
             <p class="mb-3 p-0">
-              <i class="fas fa-theater-masks text-primary me-2"></i>Team SII《幻镜》C版公演（2025.02.23 - 2025.07.27）
+              <i class="fas fa-theater-masks text-primary me-2"></i>Team SII《幻镜-C版》公演（2025.02.23 - 2025.07.27）
             </p>
             <p class="m-0 p-0">
               <i class="fas fa-theater-masks text-primary me-2"></i>Team SII《INTO THE LIGHT》公演（2025.08.16 - 2026.10.02）
