@@ -1,0 +1,345 @@
+/* ==========================================================
+   小星云之家 · 全局主题
+   设计令牌 + 基础排版 + Bootstrap 组件的统一修饰
+   ========================================================== */
+
+:root {
+  /* 颜色 */
+  --c-bg: #fbfaf7;
+  --c-surface: #ffffff;
+  --c-surface-2: #f5f3ee;
+  --c-text: #1c1917;
+  --c-text-2: #57534e;
+  --c-text-3: #a8a29e;
+  --c-border: rgba(28, 25, 23, 0.08);
+  --c-border-strong: rgba(28, 25, 23, 0.16);
+
+  --c-accent: #f2b705;          /* 应援色：黄色 */
+  --c-accent-strong: #d99a00;
+  --c-accent-soft: #fff5d1;
+  --c-accent-ink: #7a5600;
+
+  --c-ink: #221d33;             /* 深色主按钮：星云紫黑 */
+  --c-ink-hover: #36304d;
+
+  /* 尺寸 */
+  --container: 1200px;
+  --gutter: 24px;
+  --header-h: 64px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04), 0 2px 8px rgba(28, 25, 23, 0.04);
+  --shadow-md: 0 4px 12px rgba(28, 25, 23, 0.05), 0 12px 32px rgba(28, 25, 23, 0.06);
+  --shadow-lg: 0 12px 24px rgba(28, 25, 23, 0.06), 0 24px 64px rgba(28, 25, 23, 0.1);
+
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'HarmonyOS Sans SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Bootstrap 变量 */
+  --bs-body-font-family: var(--font-sans);
+  --bs-body-bg: var(--c-bg);
+  --bs-body-color: var(--c-text);
+  --bs-border-color: var(--c-border-strong);
+  --bs-border-radius: var(--radius-sm);
+  --bs-secondary-color: var(--c-text-2);
+  --bs-link-color-rgb: 34, 29, 51;
+  --bs-link-hover-color-rgb: 217, 154, 0;
+  --bs-focus-ring-color: rgba(242, 183, 5, 0.3);
+
+  color-scheme: light;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --gutter: 16px;
+    --header-h: 58px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+html.no-scroll {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(242, 183, 5, 0.35);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--c-text);
+  letter-spacing: -0.005em;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* 页面容器：所有页面的根元素 */
+.page {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* 通用小标题 */
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-accent-ink);
+}
+
+.kicker::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--c-accent);
+  box-shadow: 0 0 0 4px rgba(242, 183, 5, 0.2);
+}
+
+/* 通用卡片 */
+.surface {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.section-title {
+  margin: 0 0 14px;
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-weight: 800;
+}
+
+/* ==========================================================
+   Bootstrap 组件修饰
+   ========================================================== */
+
+.btn {
+  --bs-btn-font-weight: 600;
+  --bs-btn-border-radius: 999px;
+  --bs-btn-padding-x: 1.1rem;
+  --bs-btn-focus-box-shadow: 0 0 0 4px rgba(242, 183, 5, 0.28);
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease,
+    box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.btn:not(:disabled):not(.disabled):hover {
+  transform: translateY(-1px);
+}
+
+.btn:not(:disabled):not(.disabled):active {
+  transform: translateY(0);
+}
+
+.btn-sm {
+  --bs-btn-border-radius: 999px;
+  --bs-btn-padding-x: 0.85rem;
+  --bs-btn-padding-y: 0.32rem;
+  --bs-btn-font-size: 0.8125rem;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--c-ink);
+  --bs-btn-border-color: var(--c-ink);
+  --bs-btn-hover-bg: var(--c-ink-hover);
+  --bs-btn-hover-border-color: var(--c-ink-hover);
+  --bs-btn-active-bg: var(--c-ink);
+  --bs-btn-active-border-color: var(--c-ink);
+  --bs-btn-disabled-bg: var(--c-ink);
+  --bs-btn-disabled-border-color: var(--c-ink);
+}
+
+.btn-warning {
+  --bs-btn-color: #2b2100;
+  --bs-btn-bg: var(--c-accent);
+  --bs-btn-border-color: var(--c-accent);
+  --bs-btn-hover-color: #2b2100;
+  --bs-btn-hover-bg: #ffc61a;
+  --bs-btn-hover-border-color: #ffc61a;
+  --bs-btn-active-color: #2b2100;
+  --bs-btn-active-bg: var(--c-accent-strong);
+  --bs-btn-active-border-color: var(--c-accent-strong);
+  --bs-btn-disabled-color: #2b2100;
+  --bs-btn-disabled-bg: var(--c-accent);
+  --bs-btn-disabled-border-color: var(--c-accent);
+}
+
+.btn-success {
+  --bs-btn-bg: #16a34a;
+  --bs-btn-border-color: #16a34a;
+  --bs-btn-hover-bg: #15803d;
+  --bs-btn-hover-border-color: #15803d;
+  --bs-btn-disabled-bg: #16a34a;
+  --bs-btn-disabled-border-color: #16a34a;
+}
+
+.btn-danger {
+  --bs-btn-bg: #e11d48;
+  --bs-btn-border-color: #e11d48;
+  --bs-btn-hover-bg: #be123c;
+  --bs-btn-hover-border-color: #be123c;
+}
+
+.btn-secondary {
+  --bs-btn-color: var(--c-text-3);
+  --bs-btn-bg: var(--c-surface-2);
+  --bs-btn-border-color: var(--c-surface-2);
+  --bs-btn-hover-color: var(--c-text-2);
+  --bs-btn-hover-bg: #ebe8e1;
+  --bs-btn-hover-border-color: #ebe8e1;
+  --bs-btn-disabled-color: var(--c-text-3);
+  --bs-btn-disabled-bg: var(--c-surface-2);
+  --bs-btn-disabled-border-color: var(--c-surface-2);
+}
+
+.btn-outline-primary,
+.btn-outline-dark,
+.btn-outline-secondary {
+  --bs-btn-color: var(--c-text);
+  --bs-btn-bg: var(--c-surface);
+  --bs-btn-border-color: var(--c-border-strong);
+  --bs-btn-hover-color: var(--c-text);
+  --bs-btn-hover-bg: var(--c-surface-2);
+  --bs-btn-hover-border-color: var(--c-border-strong);
+  --bs-btn-active-color: var(--c-text);
+  --bs-btn-active-bg: #ebe8e1;
+  --bs-btn-active-border-color: var(--c-border-strong);
+  --bs-btn-disabled-color: var(--c-text-3);
+  --bs-btn-disabled-bg: var(--c-surface);
+  --bs-btn-disabled-border-color: var(--c-border);
+}
+
+.btn-outline-danger {
+  --bs-btn-color: #be123c;
+  --bs-btn-border-color: rgba(225, 29, 72, 0.35);
+  --bs-btn-hover-bg: #e11d48;
+  --bs-btn-hover-border-color: #e11d48;
+}
+
+.btn.disabled,
+.btn:disabled {
+  opacity: 0.55;
+}
+
+.btn-secondary.disabled,
+.btn-secondary:disabled {
+  opacity: 1;
+}
+
+.form-control,
+.form-select {
+  border-radius: 12px;
+  border-color: var(--c-border-strong);
+  background-color: var(--c-surface);
+  color: var(--c-text);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.form-control-sm,
+.form-select-sm {
+  border-radius: 10px;
+  min-height: 36px;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 4px rgba(242, 183, 5, 0.2);
+}
+
+.form-control::placeholder {
+  color: var(--c-text-3);
+}
+
+.form-check-input:checked {
+  background-color: var(--c-ink);
+  border-color: var(--c-ink);
+}
+
+.list-group {
+  --bs-list-group-border-color: var(--c-border);
+  --bs-list-group-border-radius: var(--radius-md);
+  --bs-list-group-item-padding-x: 1.25rem;
+  --bs-list-group-item-padding-y: 1rem;
+}
+
+.alert {
+  --bs-alert-border-radius: var(--radius-md);
+}
+
+.card {
+  --bs-card-border-radius: var(--radius-lg);
+  --bs-card-border-color: var(--c-border);
+}
+
+.text-muted {
+  color: var(--c-text-2) !important;
+}
+
+/* 滚动条 */
+@media (hover: hover) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(28, 25, 23, 0.16);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(28, 25, 23, 0.28);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}

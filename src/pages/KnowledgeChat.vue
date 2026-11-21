@@ -1,17 +1,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import OverlayMask from '@/components/OverlayMask.vue'
-import Topbar from '@/components/Topbar.vue'
-import Sidebar from '@/components/Sidebar.vue'
-import Notification from '@/components/Notification.vue'
-import { useResponsiveSidebar } from '@/composables/useResponsiveSidebar'
 import { useApi } from '@/composables/fetch'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()
-const { isMobile, isSidebarCollapsed } = useResponsiveSidebar()
 const { apiFetch } = useApi()
 
 const auth = useAuthStore()
@@ -107,34 +101,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="layout-page d-flex">
-    <Topbar
-      v-if="isMobile"
-      :collapsed="isSidebarCollapsed"
-      @update:collapsed="isSidebarCollapsed = $event"
-    />
-
-    <OverlayMask
-      v-if="isMobile && !isSidebarCollapsed"
-      @click="isSidebarCollapsed = true"
-    />
-
-    <Sidebar
-      :is-mobile="isMobile"
-      v-model:collapsed="isSidebarCollapsed"
-    />
-
-    <main
-      :class="[
-        'position-relative',
-        'flex-grow-1',
-        'overflow-auto',
-        'px-4',
-        !isMobile ? 'main-scrollable' : ''
-      ]"
-      :style="{ paddingTop: isMobile ? '76px' : '16px' }"
-    >
-      <Notification />
+  <div class="page">
 
       <div v-if="!authChecked" class="text-muted py-4 text-center">正在校验登录状态...</div>
 
@@ -220,6 +187,5 @@ onUnmounted(() => {
           <div v-if="rebuildMessage" class="small mt-1" :class="rebuildSuccess ? 'text-success' : 'text-danger'">{{ rebuildMessage }}</div>
         </div>
       </div>
-    </main>
   </div>
 </template>

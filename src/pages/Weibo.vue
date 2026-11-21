@@ -1,38 +1,9 @@
 <script setup>
-import OverlayMask from '@/components/OverlayMask.vue'
-import Topbar from '@/components/Topbar.vue'
-import Sidebar from '@/components/Sidebar.vue'
-import Notification from '@/components/Notification.vue'
-import { useResponsiveSidebar } from '@/composables/useResponsiveSidebar'
 
-const { isMobile, isSidebarCollapsed } = useResponsiveSidebar()
 </script>
 
 <template>
-  <div class="weibo-page layout-page d-flex">
-    <!-- 顶部栏：仅移动端显示 -->
-    <Topbar
-      v-if="isMobile"
-      :collapsed="isSidebarCollapsed"
-      @update:collapsed="isSidebarCollapsed = $event"
-    />
-
-    <!-- 遮罩：必须放在 Sidebar 后面、Main 前面 -->
-    <OverlayMask
-      v-if="isMobile && !isSidebarCollapsed"
-      @click="isSidebarCollapsed = true"
-    />
-
-    <!-- 侧边栏 -->
-    <Sidebar
-      :is-mobile="isMobile"
-      v-model:collapsed="isSidebarCollapsed"
-    />
-
-    <main 
-      class="main-area d-flex flex-column justify-content-center align-items-end flex-grow-1 pe-5"
-      :style="{ paddingTop: isMobile ? '76px' : '16px' }"
-    >
+  <div class="page">
 
       <div class="glass-panel">
         <h1>微博跳转</h1>
@@ -41,7 +12,6 @@ const { isMobile, isSidebarCollapsed } = useResponsiveSidebar()
           <a href="https://weibo.com/u/6660861957" target="_blank">应援站微博</a>
         </div>
       </div>
-    </main>
   </div>
 </template>
 

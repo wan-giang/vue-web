@@ -1,27 +1,11 @@
-/* 日期cell宽度小于82px时，标签在数字下方 */
-.day-cell {
-  container-type: inline-size;
-}
-@container (max-width: 81px) {
-  .day-top {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    justify-content: flex-start !important;
-    gap: 4px !important;
-  }
-}
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
-import OverlayMask from '@/components/OverlayMask.vue'
-import Topbar from '@/components/Topbar.vue'
-import Sidebar from '@/components/Sidebar.vue'
-import Notification from '@/components/Notification.vue'
 import SocialIcon from '@/components/SocialIcon.vue'
-import { useResponsiveSidebar } from '@/composables/useResponsiveSidebar'
+import { useIsMobile } from '@/composables/useIsMobile'
 import { useApi } from '@/composables/fetch'
 
-const { isMobile, isSidebarCollapsed } = useResponsiveSidebar()
+const { isMobile } = useIsMobile()
 const { apiFetch } = useApi()
 
 const stages = ref([])
@@ -376,42 +360,36 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="layout-page d-flex">
-    <!-- 顶部栏：仅移动端显示 -->
-    <Topbar
-      v-if="isMobile"
-      :collapsed="isSidebarCollapsed"
-      @update:collapsed="isSidebarCollapsed = $event"
-    />
+  <div class="page">
+    <div class="home-content">
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="kicker">SNH48 · Team SII · 十八期生</p>
+            <h1 class="hero-title">
+              <span class="hero-title-main">小星云之家</span>
+              <span class="hero-title-sub">All for 周童玥</span>
+            </h1>
+            <p class="hero-phrase">“这是新月，这是满月，这是——<strong>周童玥</strong>！”</p>
+            <div class="hero-cta">
+              <router-link to="/stages" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-masks-theater me-2"></i>公演及活动
+              </router-link>
+              <router-link to="/baike" class="btn btn-outline-dark btn-lg">
+                认识小周<i class="fa-solid fa-arrow-right ms-2"></i>
+              </router-link>
+            </div>
+          </div>
 
-    <!-- 遮罩：必须放在 Sidebar 后面、Main 前面 -->
-    <OverlayMask
-      v-if="isMobile && !isSidebarCollapsed"
-      @click="isSidebarCollapsed = true"
-    />
-
-    <!-- 侧边栏 -->
-    <Sidebar
-      :is-mobile="isMobile"
-      v-model:collapsed="isSidebarCollapsed"
-    />
-
-    <!-- 主内容 -->
-    <main
-      class="home-main flex-fill d-flex flex-column bg-white px-4"
-      :style="{ paddingTop: isMobile ? '76px' : '16px' }"
-    >
-      <!-- 放在顶部 -->
-      <Notification />
-
-      <div class="home-content flex-grow-1">
-        <section class="hero-panel text-center">
-          <h1 :class="['art-text', isMobile ? 'art-text-mobile' : 'art-text-pc']">
-            小星云之家
-          </h1>
-          <!-- <p class="code">（内测中）</p>
-          <p class="code">“这是新月，这是满月，这是——周童玥！”</p>
-          <p class="code">神秘代码：158139179</p> -->
+          <div class="hero-visual" aria-hidden="true">
+            <div class="hero-orbit">
+              <span class="orbit-ring ring-1"></span>
+              <span class="orbit-ring ring-2"></span>
+              <span class="orbit-star star-1"></span>
+              <span class="orbit-star star-2"></span>
+              <span class="orbit-star star-3"></span>
+              <img class="hero-avatar" src="https://www.snh48.com/images/member/zp_10290.jpg" alt="" />
+            </div>
+          </div>
         </section>
 
         <div class="home-body">
@@ -722,24 +700,15 @@ onMounted(() => {
           </aside>
         </div>
       </div>
-    </main>
   </div>
 </template>
 
 <style scoped>
-.home-main {
-  overflow: auto;
-  background:
-    radial-gradient(circle at top left, rgba(231, 245, 255, 0.92), transparent 34%),
-    radial-gradient(circle at top right, rgba(255, 241, 215, 0.74), transparent 28%),
-    linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-}
-
 .home-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding-bottom: 32px;
+  gap: 20px;
+  padding-bottom: 0;
 }
 
 .home-body {
@@ -749,33 +718,149 @@ onMounted(() => {
   align-items: start;
 }
 
-.hero-panel {
-  padding: 28px 18px 12px;
+/* ===== Hero ===== */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  align-items: center;
+  gap: 32px;
+  padding: 32px 0 4px;
+}
+
+.hero-title {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hero-title-main {
+  font-size: clamp(44px, 7vw, 76px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  background: linear-gradient(100deg, #221d33 10%, #6b4fbf 55%, #d99a00 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-title-sub {
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--c-text-3);
+}
+
+.hero-phrase {
+  margin: 20px 0 0;
+  font-size: clamp(16px, 2vw, 19px);
+  color: var(--c-text-2);
+}
+
+.hero-phrase strong {
+  color: var(--c-text);
+  background: linear-gradient(transparent 62%, rgba(242, 183, 5, 0.45) 62%);
+}
+
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.hero-cta .btn-lg {
+  --bs-btn-padding-x: 1.5rem;
+  --bs-btn-padding-y: 0.7rem;
+  --bs-btn-font-size: 15px;
+}
+
+.hero-visual {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-orbit {
+  position: relative;
+  width: min(320px, 70vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.hero-avatar {
+  position: relative;
+  width: 62%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 999px;
+  border: 6px solid #fff;
+  box-shadow: 0 0 0 2px var(--c-accent), 0 24px 60px rgba(217, 154, 0, 0.28);
+}
+
+.orbit-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1px dashed rgba(107, 79, 191, 0.25);
+  animation: orbit-spin 40s linear infinite;
+}
+
+.orbit-ring.ring-2 {
+  inset: 12%;
+  border: 1px solid rgba(242, 183, 5, 0.35);
+  animation-duration: 28s;
+  animation-direction: reverse;
+}
+
+.orbit-star {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--c-accent);
+  box-shadow: 0 0 16px 4px rgba(242, 183, 5, 0.55);
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+
+.star-1 { top: 8%; left: 22%; }
+.star-2 { bottom: 14%; right: 6%; width: 7px; height: 7px; background: #b9a6ff; box-shadow: 0 0 14px 4px rgba(185, 166, 255, 0.6); animation-delay: 1s; }
+.star-3 { top: 38%; right: 0; width: 5px; height: 5px; animation-delay: 2s; }
+
+@keyframes orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
 }
 
 .calendar-panel {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 28px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-md);
   padding: 24px;
   backdrop-filter: blur(12px);
 }
 
 .social-panel {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 28px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 251, 255, 0.98) 100%);
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-md);
   padding: 24px;
   position: sticky;
-  top: 16px;
+  top: calc(var(--header-h) + 16px);
 }
 
 .social-panel-header h2 {
   margin: 0;
   font-size: 24px;
-  color: #0f172a;
+  font-weight: 800;
+  color: var(--c-text);
 }
 
 .social-intro {
@@ -818,7 +903,7 @@ onMounted(() => {
   border-radius: 20px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   text-decoration: none;
-  color: #0f172a;
+  color: var(--c-text);
   background: #fff;
   overflow: hidden;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
@@ -861,7 +946,7 @@ onMounted(() => {
 .social-name {
   font-size: 17px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--c-text);
 }
 
 .social-name-row {
@@ -898,16 +983,18 @@ onMounted(() => {
 .detail-kicker {
   margin: 0 0 6px;
   font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #64748b;
+  color: var(--c-accent-ink);
 }
 
 .calendar-header h2,
 .detail-header h3 {
   margin: 0;
   font-size: 24px;
-  color: #0f172a;
+  font-weight: 800;
+  color: var(--c-text);
 }
 
 .calendar-actions {
@@ -917,11 +1004,13 @@ onMounted(() => {
 }
 
 .calendar-button {
-  border: 1px solid rgba(15, 23, 42, 0.12);
+  border: 1px solid var(--c-border-strong);
   border-radius: 999px;
   background: #ffffff;
-  color: #0f172a;
-  padding: 10px 16px;
+  color: var(--c-text);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
   transition: all 0.2s ease;
 }
 
@@ -945,7 +1034,7 @@ onMounted(() => {
 .detail-badge {
   border-radius: 999px;
   padding: 8px 14px;
-  background: #0f172a;
+  background: var(--c-ink);
   color: #fff;
   font-size: 13px;
 }
@@ -1071,12 +1160,12 @@ onMounted(() => {
 }
 
 .day-cell.is-today {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.12) inset;
+  border-color: var(--c-accent);
+  background: var(--c-accent-soft) !important;
 }
 
 .day-cell.is-selected {
-  border-color: #0f172a;
+  border-color: var(--c-ink);
   box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.08) inset, 0 14px 30px rgba(15, 23, 42, 0.1);
 }
 
@@ -1092,7 +1181,7 @@ onMounted(() => {
 .day-number {
   font-size: 15px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--c-text);
 }
 
 .day-type-badge {
@@ -1127,7 +1216,7 @@ onMounted(() => {
 .mobile-selected-title {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--c-text);
 }
 
 .mobile-selected-count {
@@ -1249,9 +1338,9 @@ onMounted(() => {
 
 .detail-panel {
   margin-top: 6px;
-  border-radius: 24px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border-radius: 20px;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface-2);
   padding: 18px;
 }
 
@@ -1279,7 +1368,7 @@ onMounted(() => {
 .detail-item h4 {
   margin: 10px 0 6px;
   font-size: 16px;
-  color: #0f172a;
+  color: var(--c-text);
 }
 
 .detail-title-sub {
@@ -1345,13 +1434,28 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .home-main {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 8px;
+    padding: 16px 0 0;
   }
 
-  .hero-panel {
-    padding: 14px 6px 8px;
+  .hero-visual {
+    order: -1;
+  }
+
+  .hero-orbit {
+    width: 200px;
+  }
+
+  .hero-copy .kicker {
+    justify-content: center;
+  }
+
+  .hero-cta {
+    justify-content: center;
+    margin-top: 20px;
   }
 
   .calendar-panel {

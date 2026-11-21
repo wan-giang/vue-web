@@ -1,13 +1,10 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import OverlayMask from '@/components/OverlayMask.vue'
-import Topbar from '@/components/Topbar.vue'
-import Sidebar from '@/components/Sidebar.vue'
-import Notification from '@/components/Notification.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import { useApi } from '@/composables/fetch'
-import { useResponsiveSidebar } from '@/composables/useResponsiveSidebar'
+import { useIsMobile } from '@/composables/useIsMobile'
 
-const { isMobile, isSidebarCollapsed } = useResponsiveSidebar()
+const { isMobile } = useIsMobile()
 const { apiFetch } = useApi()
 
 const portraitItems = ref([])
@@ -159,45 +156,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="layout-page d-flex">
-    <Topbar
-      v-if="isMobile"
-      :collapsed="isSidebarCollapsed"
-      @update:collapsed="isSidebarCollapsed = $event"
-    />
-
-    <OverlayMask
-      v-if="isMobile && !isSidebarCollapsed"
-      @click="isSidebarCollapsed = true"
-    />
-
-    <Sidebar
-      :is-mobile="isMobile"
-      v-model:collapsed="isSidebarCollapsed"
-    />
-
-    <main
-      :class="[
-        'flex-fill',
-        'd-flex',
-        'flex-column',
-        'bg-white',
-        'text-center',
-        'px-4',
-        !isMobile ? 'main-scrollable' : ''
-      ]"
-      :style="{ paddingTop: isMobile ? '76px' : '16px' }"
-    >
-      <Notification />
+  <div class="page text-center">
 
       <section class="portrait-section">
-        <div class="portrait-header">
-          <p class="portrait-kicker">Official Portrait</p>
-          <h1 class="portrait-page-title">公式照展示</h1>
-          <!-- <p class="portrait-desc">桌面端按整组展示当前版本与历史版本，移动端支持折叠查看和横向切换组图。</p> -->
-        </div>
+        <PageHeader kicker="Official Portrait" title="公式照展示" />
 
-        <div v-if="isLoading" class="empty-tip">正在加载公式照…</div>
+        <div v-if="isLoading" class="empty-tip"><span class="spinner-border spinner-border-sm me-2"></span>正在加载公式照…</div>
         <div v-else-if="orderedPortraitItems.length === 0" class="empty-tip">暂无公式照数据</div>
 
         <div v-else class="portrait-list">
@@ -303,42 +267,15 @@ onMounted(() => {
           </article>
         </div>
       </section>
-    </main>
   </div>
 </template>
 
 <style scoped>
 .portrait-section {
-  width: min(1120px, 100%);
+  width: 100%;
   margin: 0 auto;
-  padding: 18px 0 40px;
+  padding: 0;
   text-align: left;
-}
-
-.portrait-header {
-  margin: 0 auto 28px;
-  padding: 24px 28px;
-  border-radius: 28px;
-  background: linear-gradient(135deg, #fff7dc 0%, #ffffff 45%, #fff1b8 100%);
-  border: 1px solid rgba(242, 183, 5, 0.2);
-  box-shadow: 0 18px 40px rgba(125, 90, 17, 0.08);
-  text-align: center;
-}
-
-.portrait-kicker {
-  margin: 0 0 6px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #9e7b15;
-}
-
-.portrait-page-title {
-  margin: 0;
-  font-size: clamp(30px, 5vw, 46px);
-  font-weight: 800;
-  color: #332505;
 }
 
 .portrait-desc {
@@ -356,16 +293,17 @@ onMounted(() => {
 }
 
 .portrait-block {
-  border-radius: 24px;
-  border: 1px solid #f3e7bf;
-  background: linear-gradient(180deg, #fffdf6 0%, #ffffff 100%);
-  box-shadow: 0 12px 30px rgba(120, 95, 36, 0.08);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-sm);
   padding: 24px;
 }
 
 .portrait-block.current {
-  border-color: rgba(242, 183, 5, 0.45);
-  box-shadow: 0 18px 40px rgba(201, 151, 24, 0.18);
+  border-color: rgba(242, 183, 5, 0.5);
+  background: linear-gradient(180deg, #fffaf0 0%, #ffffff 60%);
+  box-shadow: 0 18px 40px rgba(201, 151, 24, 0.14);
 }
 
 .portrait-heading-row {
@@ -388,7 +326,7 @@ onMounted(() => {
   font-size: clamp(22px, 3vw, 28px);
   font-weight: 800;
   line-height: 1.3;
-  color: #312404;
+  color: var(--c-text);
 }
 
 .portrait-date {
@@ -425,25 +363,33 @@ onMounted(() => {
 .portrait-card {
   margin: 0;
   overflow: hidden;
-  border-radius: 18px;
-  background: #f8f2dd;
-  border: 1px solid rgba(242, 183, 5, 0.24);
-  box-shadow: 0 10px 24px rgba(121, 98, 38, 0.12);
+  border-radius: 16px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+@media (hover: hover) {
+  .portrait-desktop-grid .portrait-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
 }
 
 .portrait-card img {
   display: block;
   width: 100%;
   height: auto;
-  background: #f6edd0;
+  background: var(--c-surface-2);
 }
 
 .portrait-card figcaption {
   padding: 10px 12px;
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.08em;
-  color: #7d6212;
+  color: var(--c-text-2);
   text-transform: uppercase;
   text-align: center;
 }
@@ -551,21 +497,17 @@ onMounted(() => {
 
 .empty-tip {
   padding: 36px 18px;
-  border-radius: 20px;
-  background: #fff9e8;
-  color: #887242;
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  border: 1px dashed var(--c-border-strong);
+  color: var(--c-text-3);
   font-size: 15px;
   text-align: center;
 }
 
 @media (max-width: 768px) {
   .portrait-section {
-    padding: 10px 0 28px;
-  }
-
-  .portrait-header {
-    padding: 22px 18px;
-    border-radius: 22px;
+    padding: 0;
   }
 
   .portrait-block {

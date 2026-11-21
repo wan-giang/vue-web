@@ -1,17 +1,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import OverlayMask from '@/components/OverlayMask.vue'
-import Topbar from '@/components/Topbar.vue'
-import Sidebar from '@/components/Sidebar.vue'
-import Notification from '@/components/Notification.vue'
-import { useResponsiveSidebar } from '@/composables/useResponsiveSidebar'
 import { useApi } from '@/composables/fetch'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 
-// 响应式侧边栏
-const { isMobile, isSidebarCollapsed } = useResponsiveSidebar()
 
 // 引入 Pinia 状态
 const auth = useAuthStore()
@@ -75,61 +68,92 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <div class="layout-page d-flex">
-    <Topbar
-      v-if="isMobile"
-      :collapsed="isSidebarCollapsed"
-      @update:collapsed="isSidebarCollapsed = $event"
-    />
+  <div class="page login-page">
 
-    <OverlayMask
-      v-if="isMobile && !isSidebarCollapsed"
-      @click="isSidebarCollapsed = true"
-    />
 
-    <Sidebar
-      :is-mobile="isMobile"
-      v-model:collapsed="isSidebarCollapsed"
-    />
+      <div class="login-card surface">
+        <span class="login-icon"><i class="fa-solid fa-user-shield"></i></span>
 
-    <main
-      :class="[
-        'flex-fill',
-        'd-flex',
-        'flex-column',
-        'bg-white',
-        'text-center',
-        'px-4',
-        !isMobile ? 'main-scrollable' : ''
-      ]"
-      :style="{ paddingTop: isMobile ? '76px' : '16px' }"
-    >
-
-      <Notification />
-
-      <div
-        style="width: 300px; margin: auto"
-        class="d-flex flex-column justify-content-center align-items-center flex-grow-1 text-center"
-      >
         <template v-if="!authChecked">
-          <h2>加载中...</h2>
+          <h2 class="login-title">加载中...</h2>
         </template>
 
         <template v-else-if="isLoggedIn">
-          <h2>🎉 已登录</h2>
+          <h2 class="login-title">已登录</h2>
+          <p class="login-sub">欢迎回来，管理员。</p>
           <button class="btn btn-primary w-100 mt-3" @click="router.push('/admin-logs')">查看操作日志</button>
-          <button class="btn btn-danger w-100 mt-3" @click="handleLogout">退出登录</button>
+          <button class="btn btn-outline-danger w-100 mt-2" @click="handleLogout">退出登录</button>
         </template>
 
         <template v-else>
-          <h2 class="mb-3">网站管理员登录</h2>
-          <input v-model="username" type="text" placeholder="用户名" class="form-control mb-2" />
-          <input v-model="password" type="password" placeholder="密码" class="form-control mb-3" />
-          <button @click="login" class="btn btn-primary w-100">登录</button>
+          <h2 class="login-title">网站管理员登录</h2>
+          <p class="login-sub">仅限本站管理员使用</p>
+          <form class="text-start" @submit.prevent="login">
+            <input v-model="username" type="text" placeholder="用户名" autocomplete="username" class="form-control mb-2" />
+            <input v-model="password" type="password" placeholder="密码" autocomplete="current-password" class="form-control mb-3" />
+            <button type="submit" class="btn btn-primary w-100">登录</button>
+          </form>
         </template>
 
-        <p class="mt-3" :style="{ color: isLoggedIn ? 'green' : 'red' }">{{ message }}</p>
+        <p v-if="message" class="login-message" :class="isLoggedIn ? 'ok' : 'err'">{{ message }}</p>
       </div>
-    </main>
   </div>
 </template>
+
+<style scoped>
+.login-page {
+  min-height: calc(100vh - var(--header-h) - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 48px;
+}
+
+.login-card {
+  width: min(380px, 100%);
+  padding: 36px 28px 28px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.login-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: var(--c-ink);
+  color: var(--c-accent);
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.login-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.login-sub {
+  margin: 6px 0 22px;
+  color: var(--c-text-3);
+  font-size: 14px;
+}
+
+.login-message {
+  margin: 16px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.login-message.ok {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.login-message.err {
+  background: #ffe4e6;
+  color: #be123c;
+}
+</style>

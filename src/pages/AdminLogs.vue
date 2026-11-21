@@ -1,17 +1,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import OverlayMask from '@/components/OverlayMask.vue'
-import Topbar from '@/components/Topbar.vue'
-import Sidebar from '@/components/Sidebar.vue'
-import Notification from '@/components/Notification.vue'
-import { useResponsiveSidebar } from '@/composables/useResponsiveSidebar'
 import { useApi } from '@/composables/fetch'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()
-const { isMobile, isSidebarCollapsed } = useResponsiveSidebar()
 const { apiFetch } = useApi()
 
 const auth = useAuthStore()
@@ -68,40 +62,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="layout-page d-flex">
-    <Topbar
-      v-if="isMobile"
-      :collapsed="isSidebarCollapsed"
-      @update:collapsed="isSidebarCollapsed = $event"
-    />
-
-    <OverlayMask
-      v-if="isMobile && !isSidebarCollapsed"
-      @click="isSidebarCollapsed = true"
-    />
-
-    <Sidebar
-      :is-mobile="isMobile"
-      v-model:collapsed="isSidebarCollapsed"
-    />
-
-    <main
-      :class="[
-        'flex-fill',
-        'bg-white',
-        'px-4',
-        !isMobile ? 'main-scrollable' : ''
-      ]"
-      :style="{ paddingTop: isMobile ? '76px' : '16px' }"
-    >
-      <Notification />
+  <div class="page admin-page">
 
       <div v-if="!authChecked" class="text-muted">正在校验登录状态...</div>
 
       <template v-else-if="isLoggedIn">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
-          <h2 class="mb-1">管理员操作日志</h2>
+          <p class="kicker mb-1">Admin</p>
+          <h2 class="mb-1 fw-bold">管理员操作日志</h2>
           <!-- <p class="mb-0 text-muted small">只展示包含“用户:”的日志记录</p>
           <p v-if="logFile" class="mb-0 text-muted small">日志文件：{{ logFile }}</p> -->
         </div>
@@ -130,17 +99,34 @@ onUnmounted(() => {
 
         <div v-else-if="logs.length === 0" class="text-muted">没有匹配到包含“用户:”的日志。</div>
 
-        <ul v-else class="list-group mb-4">
+        <ul v-else class="list-group log-list mb-4">
           <li
             v-for="(line, idx) in logs"
             :key="idx"
             class="list-group-item"
-            style="font-family: 'Courier New', monospace; white-space: pre-wrap; word-break: break-word;"
+
           >
             {{ line }}
           </li>
         </ul>
       </template>
-    </main>
   </div>
 </template>
+
+<style scoped>
+.admin-page {
+  padding-top: 20px;
+}
+
+.log-list .list-group-item {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Courier New', monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 10px 16px;
+}
+
+.log-list .list-group-item:nth-child(even) {
+  background: var(--c-surface-2);
+}
+</style>

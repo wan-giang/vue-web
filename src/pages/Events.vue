@@ -1,13 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import OverlayMask from '@/components/OverlayMask.vue'
-import Topbar from '@/components/Topbar.vue'
-import Sidebar from '@/components/Sidebar.vue'
-import Notification from '@/components/Notification.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import { useApi } from '@/composables/fetch'
-import { useResponsiveSidebar } from '@/composables/useResponsiveSidebar'
 
-const { isMobile, isSidebarCollapsed } = useResponsiveSidebar()
 
 const timelineItems = ref([])
 const isLoading = ref(true)
@@ -97,41 +92,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="layout-page d-flex">
-    <!-- 顶部栏：仅移动端显示 -->
-    <Topbar
-      v-if="isMobile"
-      :collapsed="isSidebarCollapsed"
-      @update:collapsed="isSidebarCollapsed = $event"
-    />
+  <div class="page text-center">
 
-    <!-- 遮罩：必须放在 Sidebar 后面、Main 前面 -->
-    <OverlayMask
-      v-if="isMobile && !isSidebarCollapsed"
-      @click="isSidebarCollapsed = true"
-    />
+      <PageHeader
+        kicker="Timeline"
+        title="大事年表"
+        description="除特别注明外，所有图片均来自 SNH48 公演直播截图，或由 SNH48 官方微博发布。"
+      />
 
-    <!-- 侧边栏 -->
-    <Sidebar
-      :is-mobile="isMobile"
-      v-model:collapsed="isSidebarCollapsed"
-    />
-
-    <main
-      :class="[
-        'flex-fill',
-        'd-flex',
-        'flex-column',
-        'bg-white',
-        'text-center',
-        'px-4',
-        !isMobile ? 'main-scrollable' : ''
-      ]"
-      :style="{ paddingTop: isMobile ? '76px' : '16px' }"
-    >
-      <Notification />
-
-      <h2 class="timeline-title">Team SII《48Hz》首演 周童玥Unit《Up To You（真相背后）》</h2>
+      <section class="featured surface">
+        <div class="featured-head">
+          <span class="featured-badge"><i class="fa-solid fa-play me-1"></i>精选视频</span>
+          <h2 class="featured-title">Team SII《48Hz》首演 周童玥Unit《Up To You（真相背后）》</h2>
+        </div>
       <div class="video-wrapper">
         <iframe
           src="https://player.bilibili.com/player.html?isOutside=true&aid=117416856196521&bvid=BV1YSpu6gEHF&cid=42650371492&p=1"
@@ -140,13 +113,10 @@ onMounted(() => {
           allowfullscreen
         ></iframe>
       </div>
-      <p class="small text-body-secondary">*视频来源于B站。相关推荐视频列表由B站自动生成，与本站无关，亦不代表本站立场。</p>
+        <p class="featured-note">*视频来源于B站。相关推荐视频列表由B站自动生成，与本站无关，亦不代表本站立场。</p>
+      </section>
 
       <section class="timeline-section">
-        <h2 class="timeline-title">大事年表</h2>
-        <p class="text-center">
-          除特别注明外，所有图片均来自SNH48公演直播截图，或由SNH48官方微博发布。
-        </p>
 
         <!-- ① 年表类型切换：重要 / 全部 -->
         <div class="scope-filter">
@@ -233,23 +203,59 @@ onMounted(() => {
           <div v-else-if="filteredTimelineItems.length === 0" class="empty-tip">当前筛选无数据</div>
         </div>
       </section>
-    </main>
   </div>
 </template>
 
 <style scoped>
+.featured {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.featured-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.featured-badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--c-ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.featured-title {
+  margin: 0;
+  font-size: clamp(17px, 2.4vw, 22px);
+  font-weight: 800;
+}
+
+.featured-note {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--c-text-3);
+}
+
 .video-wrapper {
   width: 100%;
-  max-width: 960px;
   margin: 0 auto;
   aspect-ratio: 16 / 9;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
 }
 .video-wrapper iframe { width: 100%; height: 100%; border: none; }
 
 .timeline-section {
   width: 100%;
   max-width: 1000px;
-  margin: 28px auto 40px;
+  margin: 28px auto 0;
   text-align: left;
 }
 
@@ -263,25 +269,31 @@ onMounted(() => {
 /* ===== 年表类型切换 ===== */
 .scope-filter {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 8px 0 10px;
-  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  gap: 4px;
+  margin: 8px auto 14px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
 }
 
 .scope-btn {
-  border: 1px solid #eee;
-  background: #fff;
-  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  padding: 8px 18px;
   border-radius: 999px;
   cursor: pointer;
   font-weight: 700;
-  color: #444;
+  font-size: 14px;
+  color: var(--c-text-2);
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 .scope-btn.active {
-  border-color: #ffc107;              /* warning */
-  background: #ffc107;  /* warning 浅黄 */
-  color: #111;                 /* 深黄字 */
+  background: var(--c-surface);
+  color: var(--c-text);
+  box-shadow: var(--shadow-sm);
 }
 
 /* ===== 年份筛选条 ===== */
@@ -293,18 +305,25 @@ onMounted(() => {
   justify-content: center;
 }
 .year-btn {
-  border: 1px solid #eee;
-  background: #fff;
-  padding: 8px 14px;
+  border: 1px solid var(--c-border-strong);
+  background: var(--c-surface);
+  padding: 6px 16px;
   border-radius: 999px;
   cursor: pointer;
-  font-weight: 700;
-  color: #444;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--c-text-2);
+  font-variant-numeric: tabular-nums;
+  transition: all 0.2s ease;
+}
+.year-btn:hover {
+  color: var(--c-text);
+  border-color: var(--c-text-3);
 }
 .year-btn.active {
-  border-color: #f2b705;
-  background: rgba(242, 183, 5, 0.12);
-  color: #111;
+  border-color: var(--c-ink);
+  background: var(--c-ink);
+  color: #fff;
 }
 
 .empty-tip {
@@ -372,7 +391,8 @@ onMounted(() => {
   position: relative;
   border-radius: 18px;
   overflow: hidden;
-  border: 3px solid #f2b705;
+  border: 1px solid var(--c-border);
+  box-shadow: var(--shadow-md);
   background: #111;
   max-width: 640px;
   width: 100%;
@@ -410,37 +430,35 @@ onMounted(() => {
 
 .info-bar {
   width: min(640px, 100%);
-  background: linear-gradient(
-    180deg,
-    rgba(242, 183, 5, 0.18),
-    rgba(242, 183, 5, 0.08)
-  );
-  border-left: 6px solid #f2b705;
-  padding: 14px 18px;
-  border-radius: 10px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-left: 4px solid var(--c-accent);
+  box-shadow: var(--shadow-sm);
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
 }
 .timeline-row.reverse .info-bar {
-  border-left: none;
-  border-right: 6px solid #f2b705;
+  border-left: 1px solid var(--c-border);
+  border-right: 4px solid var(--c-accent);
 }
 .info-date {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
-  color: #f2b705; /* 主体黄色 */
+  color: var(--c-accent-strong);
   padding-bottom: 10px;
-  border-bottom: 2px solid rgba(242, 183, 5, 0.45);
+  border-bottom: 1px solid var(--c-border);
   margin-bottom: 10px;
 }
 .info-sub {
-  font-size: 18px;
-  color: #555;
+  font-size: 17px;
+  color: var(--c-text);
   letter-spacing: 0.5px;
   font-weight: 600;
 }
 .info-detail {
   padding-top: 8px;
-  font-size: 12px;
-  color: #555;
+  font-size: 13px;
+  color: var(--c-text-2);
   letter-spacing: 0.5px;
   white-space: pre-line;
   line-height: 1.65;
@@ -483,8 +501,8 @@ onMounted(() => {
   }
 
   .timeline-row.reverse .info-bar {
-    border-right: none;
-    border-left: 6px solid #f2b705;
+    border-right: 1px solid var(--c-border);
+    border-left: 4px solid var(--c-accent);
   }
 }
 
@@ -496,10 +514,11 @@ onMounted(() => {
   padding: 6px 0 10px;
 }
 .event-item {
-  border: 1px solid #eee;
-  border-radius: 14px;
-  padding: 14px 16px;
-  background: #fff;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  background: var(--c-surface);
+  box-shadow: var(--shadow-sm);
   text-align: left;
 }
 .event-head {
@@ -509,9 +528,9 @@ onMounted(() => {
   margin-bottom: 8px;
 }
 .event-date {
-  font-size: 16px;
-  font-weight: 900;
-  color: #f2b705;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--c-accent-strong);
 }
 .badge-imp {
   font-size: 12px;
@@ -523,9 +542,9 @@ onMounted(() => {
   font-weight: 800;
 }
 .event-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  color: #222;
+  color: var(--c-text);
   line-height: 1.35;
   margin-bottom: 6px;
 }

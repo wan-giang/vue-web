@@ -1,12 +1,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import OverlayMask from '@/components/OverlayMask.vue'
-import Topbar from '@/components/Topbar.vue'
-import Sidebar from '@/components/Sidebar.vue'
 import ZonedDateTime from '@/components/ZonedDateTime.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import Modal from '@/components/Modal.vue'
-import Notification from '@/components/Notification.vue'
-import { useResponsiveSidebar } from '@/composables/useResponsiveSidebar'
 import { useApi } from '@/composables/fetch'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
@@ -15,8 +11,6 @@ import { useRouter } from 'vue-router'
 // 增加路由
 // const router = useRouter()
 
-// 响应式侧边栏
-const { isMobile, isSidebarCollapsed } = useResponsiveSidebar()
 
 // 引入 Pinia 状态
 const auth = useAuthStore()
@@ -627,153 +621,130 @@ const canShowLiveButton = (startDateLike) => {
 </script>
 
 <template>
-  <div class="layout-page d-flex">
-    <!-- 顶部栏：仅移动端显示 -->
-    <Topbar
-      v-if="isMobile"
-      :collapsed="isSidebarCollapsed"
-      @update:collapsed="isSidebarCollapsed = $event"
-    />
+  <div class="page">
 
-    <!-- 遮罩：必须放在 Sidebar 后面、Main 前面 -->
-    <OverlayMask
-      v-if="isMobile && !isSidebarCollapsed"
-      @click="isSidebarCollapsed = true"
-    />
 
-    <!-- 侧边栏 -->
-    <Sidebar
-      :is-mobile="isMobile"
-      v-model:collapsed="isSidebarCollapsed"
-    />
+      <PageHeader
+        kicker="Stages & Events"
+        title="公演及活动"
+        description="本站收录的周童玥参加的公演及活动，包括即将进行、正在进行以及已经结束的 Team SII 公演、新生公演以及其它公演和活动。"
+      />
 
-    <main
-      :class="[
-        'flex-grow-1',
-        'bg-white',
-        'px-4',
-        'overflow-auto',
-        !isMobile ? 'main-scrollable' : ''
-      ]"
-      :style="{ paddingTop: isMobile ? 'calc(76px + env(safe-area-inset-top))' : '16px' }"
-    >
+      <details class="stage-guide surface">
+        <summary>
+          <span><i class="fa-regular fa-circle-question me-2"></i>按钮说明</span>
+          <i class="fa-solid fa-chevron-down guide-chevron"></i>
+        </summary>
+        <ul class="guide-list">
+          <li><span class="guide-tag tag-live">观看直播</span>SNH48 官方账号正在直播的公演或活动。</li>
+          <li><span class="guide-tag tag-replay">完整视频回放</span>SNH48 官方账号发布的公演完整视频回放。若回放非官方发布，则会在标题注明。</li>
+          <li><span class="guide-tag tag-cut">小周cut视频</span>公演中周童玥相关内容的剪辑回放。</li>
+          <li><span class="guide-tag tag-off">灰色按钮</span>代表该场公演没有回放，或是没有制作剪辑。</li>
+        </ul>
+        <p class="guide-note">点击按钮可跳转至发布在 B 站的直播或视频页面。</p>
+      </details>
 
-      <Notification />
-
-      <!-- 公演说明文字（放在所有公演列表之前） -->
-      <div class="alert alert-info mb-4 text-center" role="note">
-        <p class="mb-1">以下是目前本站收录的 <strong>周童玥</strong> 参加的公演及活动列表，包括即将进行、正在进行以及已经结束的公演和活动。</p>
-        <p class="mb-1">收录了Team SII公演、新生公演以及其它公演和活动。</p>
-        <p class="mb-1">点击右侧按钮可跳转至发布在 B 站的直播或视频页面。</p>
-        <p class="mb-1"><strong>观看直播</strong>：SNH48 官方账号正在直播的公演或活动。</p>
-        <p class="mb-1"><strong>完整视频回放</strong>：SNH48 官方账号发布的公演完整视频回放。若回放非官方发布，则会在标题注明。</p>
-        <p class="mb-1"><strong>小周cut视频</strong>：公演中周童玥相关内容的剪辑回放。</p>
-        <p class="mb-0">如果按钮为灰色，则代表该场公演没有回放，或是没有制作剪辑。</p>
+      <div v-if="!isEast8" class="tz-warning">
+        <i class="fa-solid fa-earth-asia"></i>
+        <span><strong>注意：</strong>以下公演及活动所标出的时间，是您当前所在位置（{{ timezone }}）的时间，而非北京时间。</span>
       </div>
 
-      <div v-if="!isEast8" class="alert alert-warning mb-4 text-center">
-        <p class="mb-1">🌍 <strong>注意：</strong>以下公演及活动所标出的时间，是您当前所在位置（{{ timezone }}）的时间，而非北京时间。</p>
-      </div>
-
-      <div class="mt-4 mb-3 text-center">
-        <h3 class="mb-3">按条件筛选</h3>
-        <p class="mb-1">可按关键词、场次、公演名称、时间来筛选特定的公演。</p>
-        <p class="mb-1">若要寻找与周童玥相关的重要公演，请在关键词一栏输入 <strong>周童玥</strong> 并搜索。</p> 
-      </div>
-      <!-- ✅ 外层布局判断，只换布局，不重复内容 -->
-      <div
-        :class="[
-          'mb-4',
-          isMobile ? 'row g-2 justify-content-center' : 'd-flex flex-wrap gap-2 justify-content-center'
-        ]"
-      >
-        <div :class="isMobile ? 'col-10' : 'col-auto'">
-          <input v-model="searchQuery" class="form-control form-control-sm" placeholder="关键词，如：生日公演" />
-        </div>
-        <div :class="isMobile ? 'col-10' : 'col-auto'">
-          <input v-model="searchSession" type="number" class="form-control form-control-sm" placeholder="场次，如：239" />
-        </div>
-        <div :class="isMobile ? 'col-10' : 'col-auto'">
-          <select v-model="searchStageCode" class="form-select form-select-sm">
-            <option value="">筛选公演</option>
-            <option value="MX">命运的X号</option>
-            <option value="HJ-B">幻镜-B版</option>
-            <option value="XII">代号XII 2.0</option>
-            <option value="HJ-C">幻镜-C版</option>
-            <option value="ITL">INTO THE LIGHT</option>
-            <option value="11">1&amp;1 Anyone</option>
-            <option value="48Hz">48Hz</option>
-            <option value="SJHS">三角函数</option>
-            <option value="FX">Fire X</option>
-            <option value="SP">其它（特殊公演或非公演）</option>
-          </select>
+      <section class="filter-card surface">
+        <div class="filter-head">
+          <h2 class="filter-title"><i class="fa-solid fa-sliders me-2"></i>按条件筛选</h2>
+          <p class="filter-hint">可按关键词、场次、公演名称、时间来筛选。寻找与周童玥相关的重要公演，可在关键词中输入 <strong>周童玥</strong>。</p>
         </div>
 
-        <!-- ✅ 日期输入框：统一用 text + 切换成 date -->
-        <div :class="isMobile ? 'col-10' : 'col-auto'">
-          <input
-            v-model="searchStart"
-            :type="searchStartType"
-            class="form-control form-control-sm"
-            placeholder="开始日期"
-            @focus="searchStartType = 'date'"
-            @blur="() => { if (!searchStart) searchStartType = 'text' }"
-          />
-        </div>
-        <div :class="isMobile ? 'col-10' : 'col-auto'">
-          <input
-            v-model="searchEnd"
-            :type="searchEndType"
-            class="form-control form-control-sm"
-            placeholder="结束日期"
-            @focus="searchEndType = 'date'"
-            @blur="() => { if (!searchEnd) searchEndType = 'text' }"
-          />
-        </div>
+        <div class="filter-grid">
+          <div class="filter-field filter-wide">
+            <i class="fa-solid fa-magnifying-glass field-icon"></i>
+            <input v-model="searchQuery" class="form-control form-control-sm with-icon" placeholder="关键词，如：生日公演" @keyup.enter="applyFilters" />
+          </div>
+          <div class="filter-field">
+            <input v-model="searchSession" type="number" class="form-control form-control-sm" placeholder="场次，如：239" @keyup.enter="applyFilters" />
+          </div>
+          <div class="filter-field">
+            <select v-model="searchStageCode" class="form-select form-select-sm">
+              <option value="">全部公演</option>
+              <option value="MX">命运的X号</option>
+              <option value="HJ-B">幻镜-B版</option>
+              <option value="XII">代号XII 2.0</option>
+              <option value="HJ-C">幻镜-C版</option>
+              <option value="ITL">INTO THE LIGHT</option>
+              <option value="11">1&amp;1 Anyone</option>
+              <option value="48Hz">48Hz</option>
+              <option value="SJHS">三角函数</option>
+              <option value="FX">Fire X</option>
+              <option value="SP">其它（特殊公演或非公演）</option>
+            </select>
+          </div>
 
-        <div :class="isMobile ? 'col-5' : 'col-auto'">
-          <button class="btn btn-primary btn-sm w-100" @click="applyFilters">搜索</button>
-        </div>
-        <div :class="isMobile ? 'col-5' : 'col-auto'">
-          <button class="btn btn-outline-primary btn-sm w-100" @click="clearFilters">重置</button>
-        </div>
-      </div>
+          <!-- 日期输入框：统一用 text + 切换成 date -->
+          <div class="filter-field">
+            <input
+              v-model="searchStart"
+              :type="searchStartType"
+              class="form-control form-control-sm"
+              placeholder="开始日期"
+              @focus="searchStartType = 'date'"
+              @blur="() => { if (!searchStart) searchStartType = 'text' }"
+            />
+          </div>
+          <div class="filter-field">
+            <input
+              v-model="searchEnd"
+              :type="searchEndType"
+              class="form-control form-control-sm"
+              placeholder="结束日期"
+              @focus="searchEndType = 'date'"
+              @blur="() => { if (!searchEnd) searchEndType = 'text' }"
+            />
+          </div>
 
+          <div class="filter-actions">
+            <button class="btn btn-primary btn-sm" @click="applyFilters">搜索</button>
+            <button class="btn btn-outline-primary btn-sm" @click="clearFilters">重置</button>
+          </div>
+        </div>
+      </section>
 
       <template v-if="authChecked && isLoggedIn">
         <button class="btn btn-success mb-3 d-block mx-auto" @click="() => openModal()">
-          ➕ 新建公演或活动记录
+          <i class="fa-solid fa-plus me-1"></i> 新建公演或活动记录
         </button>
       </template>
 
-      <div class="w-100">
+      <div class="stage-groups">
         <!-- 加载状态 -->
-        <div v-if="!Object.keys(filteredStages).length" class="text-center text-muted my-4">
-          正在加载…
+        <div v-if="!Object.keys(filteredStages).length" class="stage-loading">
+          <span class="spinner-border spinner-border-sm me-2"></span>正在加载…
         </div>
 
         <!-- 数据已加载 -->
         <template v-for="(items, group) in filteredStages" :key="group">
-          <h3 v-if="items.length" class="mt-4 mb-3 text-center">{{ group }}</h3>
-          <ul class="list-group mb-3">
+          <h3 v-if="items.length" class="group-title">
+            <span>{{ group }}</span>
+            <span class="group-count">{{ items.length }}</span>
+          </h3>
+          <ul v-if="items.length" class="list-group stage-list mb-3">
             <li
               v-for="(item, index) in (expandedGroups[group] ? items : items.slice(0, maxInitial))"
               :key="item.id || item.session + item.date"
               class="list-group-item"
               >
-              <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+              <div class="stage-row d-flex flex-column flex-md-row align-items-md-center gap-2 gap-md-3">
                 <!-- 左侧：场次 + 日期 -->
-                <div class="text-center" style="min-width: 100px;">
-                  <div class="fw-bold">
+                <div class="stage-meta text-center">
+                  <div class="stage-session">
                     {{ item.session !== '0' ? `第 ${item.session} 场` : '不计入场次' }}
                   </div>
                   <ZonedDateTime :datetime="item.date" class="text-muted" />
                 </div>
 
                 <!-- 中间：标题 -->
-                <div class="flex-grow-1 d-flex justify-content-center align-items-center text-center">
+                <div class="flex-grow-1 d-flex justify-content-center justify-content-md-start align-items-center text-center text-md-start">
                   <div>
-                    <div class="fw-semibold">{{ splitTitle(item.title).mainLines[0] }}</div>
+                    <div class="stage-title">{{ splitTitle(item.title).mainLines[0] }}</div>
                     <div
                       v-for="(line, lineIndex) in splitTitle(item.title).mainLines.slice(1)"
                       :key="lineIndex"
@@ -927,10 +898,11 @@ const canShowLiveButton = (startDateLike) => {
           </ul>
           <button
             v-if="items.length > maxInitial"
-            class="btn btn-outline-primary btn-sm mb-4 d-block mx-auto"
+            class="btn btn-outline-primary btn-sm mb-2 d-block mx-auto"
             @click="toggleExpanded(group)"
           >
-            {{ expandedGroups[group] ? '收起' : '展开更多' }}
+            {{ expandedGroups[group] ? '收起' : `展开全部 ${items.length} 条` }}
+            <i class="fa-solid ms-1" :class="expandedGroups[group] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
           </button>
         </template>
       </div>
@@ -1282,6 +1254,253 @@ const canShowLiveButton = (startDateLike) => {
           </div>
         </template>
       </Modal>
-    </main>
   </div>
 </template>
+
+<style scoped>
+.stage-guide {
+  max-width: 880px;
+  margin: 0 auto 16px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.stage-guide summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.stage-guide summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide-chevron {
+  font-size: 12px;
+  color: var(--c-text-3);
+  transition: transform 0.2s ease;
+}
+
+.stage-guide[open] .guide-chevron {
+  transform: rotate(180deg);
+}
+
+.guide-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 20px 0;
+  border-top: 1px solid var(--c-border);
+}
+
+.guide-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  color: var(--c-text-2);
+  font-size: 14px;
+}
+
+.guide-tag {
+  flex-shrink: 0;
+  min-width: 96px;
+  text-align: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tag-live { background: #dcfce7; color: #15803d; }
+.tag-replay { background: #ece9f7; color: var(--c-ink); }
+.tag-cut { background: var(--c-accent-soft); color: var(--c-accent-ink); }
+.tag-off { background: var(--c-surface-2); color: var(--c-text-3); }
+
+.guide-note {
+  margin: 0;
+  padding: 4px 20px 16px;
+  font-size: 13px;
+  color: var(--c-text-3);
+}
+
+.tz-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 880px;
+  margin: 0 auto 16px;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+  font-size: 14px;
+}
+
+.tz-warning i {
+  margin-top: 4px;
+}
+
+.filter-card {
+  max-width: 880px;
+  margin: 0 auto 8px;
+  padding: 20px;
+}
+
+.filter-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.filter-hint {
+  margin: 6px 0 16px;
+  font-size: 13px;
+  color: var(--c-text-2);
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.filter-wide {
+  grid-column: span 2;
+}
+
+.filter-field {
+  position: relative;
+}
+
+.field-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--c-text-3);
+  pointer-events: none;
+}
+
+.with-icon {
+  padding-left: 34px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  grid-column: span 2;
+}
+
+.filter-actions .btn {
+  flex: 1;
+}
+
+.stage-groups {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.stage-loading {
+  text-align: center;
+  color: var(--c-text-3);
+  padding: 32px 0;
+}
+
+.group-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0 12px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.group-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  border-radius: 4px;
+  background: var(--c-accent);
+}
+
+.group-count {
+  padding: 1px 10px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  color: var(--c-text-2);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.stage-list {
+  gap: 10px;
+  --bs-list-group-border-width: 0;
+}
+
+.stage-list .list-group-item {
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--c-surface);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.stage-list .list-group-item:hover {
+  border-color: var(--c-border-strong) !important;
+  box-shadow: var(--shadow-md);
+}
+
+.stage-meta {
+  min-width: 120px;
+  padding-right: 4px;
+}
+
+.stage-session {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+
+.stage-meta :deep(*) {
+  font-size: 13px;
+}
+
+.stage-title {
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+@media (min-width: 768px) {
+  .stage-meta {
+    border-right: 1px solid var(--c-border);
+    padding-right: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filter-wide,
+  .filter-actions {
+    grid-column: 1 / -1;
+  }
+
+  .guide-list li {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .group-title {
+    font-size: 18px;
+  }
+}
+</style>
