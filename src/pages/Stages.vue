@@ -153,31 +153,35 @@ const getUnitTypeLabel = (type) => {
 
 const isPositiveInteger = (value) => /^[1-9]\d*$/.test(String(value).trim())
 
-const formatUnitDetailLine = (unitItem) => {
+// 详情弹框中每条 Unit 的结构化展示：歌名 / 站位 / 类型
+const getUnitDetail = (unitItem) => {
   const name = unitItem?.name || '-'
   const type = unitItem?.type
   const typeLabel = getUnitTypeLabel(type)
   const pos = String(unitItem?.pos ?? '').trim()
-  const isPosOne = pos === '1'
   const showPos = type === 'regular' || type === 'yueyaoqu' || type === 'b50'
   const isSpecial = type === 'special'
 
+  let posLabel = ''
+  let posKind = 'pos'
+
   if (showPos || (isSpecial && (isPositiveInteger(pos) || pos === '0'))) {
     if (pos === '0') {
-      return `${name}（Solo、${typeLabel}unit）`
+      posLabel = 'Solo'
+      posKind = 'solo'
+    } else {
+      posLabel = `${pos || '-'} 号位`
     }
-    return `${name}（${pos || '-'}号位、${typeLabel}unit）`
+  } else if (pos === '1') {
+    posLabel = ''
+  } else if (isSpecial) {
+    posLabel = pos
+  } else {
+    posLabel = pos ? `助演 ${pos}` : '助演'
+    posKind = 'support'
   }
 
-  if (isPosOne) {
-    return `${name}（${typeLabel}unit）`
-  }
-
-  if (isSpecial) {
-    return `${name}（${typeLabel}unit、${pos}）`
-  }
-
-  return `${name}（${typeLabel}unit、助演${pos || ''}）`
+  return { name, type, typeLabel, posLabel, posKind }
 }
 
 const validateUnits = (units) => {
@@ -1110,149 +1114,114 @@ const canShowLiveButton = (startDateLike) => {
         <!-- 你可以放任何 slot 内容，甚至是编辑表单 -->
       </Modal>
 
-      <Modal v-model="showDetailModal" title="详情（可上下滑动查看全部信息）" cancel-text="关闭" :show-confirm="false">
-        <template v-if="detailItem">
-          <div class="form-group row mb-2 align-items-center">
-            <label class="col-sm-3 col-form-label text-start">时间</label>
-            <div class="col-sm-9">
-              <div class="form-control-plaintext border rounded px-3 py-2 bg-light">
-                <ZonedDateTime :datetime="detailItem.date" />
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group row mb-2 align-items-center">
-            <label class="col-sm-3 col-form-label text-start">场次</label>
-            <div class="col-sm-9">
-              <div class="form-control-plaintext border rounded px-3 py-2 bg-light">
+      <Modal v-model="showDetailModal" title="公演详情" cancel-text="关闭" :show-confirm="false">
+        <div v-if="detailItem" class="detail">
+          <!-- 头部：场次 + 标题 -->
+          <header class="detail-hero">
+            <div class="detail-badges">
+              <span class="detail-session">
                 {{ detailItem.session !== '0' ? `第 ${detailItem.session} 场` : '不计入场次' }}
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group row mb-2 align-items-center">
-            <label class="col-sm-3 col-form-label text-start">标题</label>
-            <div class="col-sm-9">
-              <div class="form-control-plaintext border rounded px-3 py-2 bg-light">
-                <div>{{ splitTitle(detailItem.title).mainLines[0] || '-' }}</div>
-                <div
-                  v-for="(line, lineIndex) in splitTitle(detailItem.title).mainLines.slice(1)"
-                  :key="`detail-title-main-${lineIndex}`"
-                  class="text-muted small mt-1"
-                >
-                  {{ line }}
-                </div>
-                <div v-if="splitTitle(detailItem.title).note" class="text-muted small mt-1">
-                  <template v-for="(line, lineIndex) in splitTitle(detailItem.title).noteLines" :key="`detail-title-note-${lineIndex}`">
-                    <span>{{ line }}</span>
-                    <br v-if="lineIndex < splitTitle(detailItem.title).noteLines.length - 1" />
-                  </template>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group row mb-2 align-items-center">
-            <label class="col-sm-3 col-form-label text-start">队伍</label>
-            <div class="col-sm-9">
-              <div class="form-control-plaintext border rounded px-3 py-2 bg-light">
-                {{ getTypeLabel(detailItem.type) }}
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group row mb-2 align-items-center">
-            <label class="col-sm-3 col-form-label text-start">公演类别</label>
-            <div class="col-sm-9">
-              <div class="form-control-plaintext border rounded px-3 py-2 bg-light">
+              </span>
+              <span v-if="detailItem.stage_code" class="detail-chip">
                 {{ getStageCodeLabel(detailItem.stage_code) }}
-              </div>
+              </span>
             </div>
-          </div>
+            <h4 class="detail-title">{{ splitTitle(detailItem.title).mainLines[0] || '-' }}</h4>
+            <p
+              v-for="(line, lineIndex) in splitTitle(detailItem.title).mainLines.slice(1)"
+              :key="`detail-title-main-${lineIndex}`"
+              class="detail-subtitle"
+            >
+              {{ line }}
+            </p>
+            <p v-if="splitTitle(detailItem.title).note" class="detail-note">
+              <i class="fa-solid fa-circle-info me-1"></i>
+              <template v-for="(line, lineIndex) in splitTitle(detailItem.title).noteLines" :key="`detail-title-note-${lineIndex}`">
+                <span>{{ line }}</span>
+                <br v-if="lineIndex < splitTitle(detailItem.title).noteLines.length - 1" />
+              </template>
+            </p>
+          </header>
 
-          <div class="form-group row mb-2 align-items-center">
-            <label class="col-sm-3 col-form-label text-start">演出地点</label>
-            <div class="col-sm-9">
-              <div class="form-control-plaintext border rounded px-3 py-2 bg-light">
-                {{ getVenueLabel(detailItem.time) }}
-              </div>
+          <!-- 基本信息 -->
+          <dl class="detail-info">
+            <div class="info-item">
+              <dt><i class="fa-regular fa-calendar"></i>时间</dt>
+              <dd><ZonedDateTime :datetime="detailItem.date" format="YYYY-MM-DD HH:mm" /></dd>
             </div>
-          </div>
-
-          <!-- <div class="form-group row mb-2 align-items-center">
-            <label class="col-sm-3 col-form-label text-start">是否已结束</label>
-            <div class="col-sm-9">
-              <div class="form-control-plaintext border rounded px-3 py-2 bg-light">
-                {{ detailItem.is_end ? '是' : '否' }}
-              </div>
+            <div class="info-item">
+              <dt><i class="fa-solid fa-location-dot"></i>地点</dt>
+              <dd>{{ getVenueLabel(detailItem.time) }}</dd>
             </div>
-          </div>
-
-          <div class="form-group row mb-2 align-items-center">
-            <label class="col-sm-3 col-form-label text-start">是否为公演</label>
-            <div class="col-sm-9">
-              <div class="form-control-plaintext border rounded px-3 py-2 bg-light">
-                {{ detailItem.is_stage ? '是' : '否' }}
-              </div>
+            <div class="info-item">
+              <dt><i class="fa-solid fa-user-group"></i>队伍</dt>
+              <dd>{{ getTypeLabel(detailItem.type) }}</dd>
             </div>
-          </div> -->
+          </dl>
 
-          <div class="form-group row mb-2">
-            <label class="col-sm-3 col-form-label text-start">Unit</label>
-            <div class="col-sm-9">
-              <div
-                v-if="Array.isArray(detailItem.unit) && detailItem.unit.length"
-                class="border rounded bg-light"
+          <!-- Unit 列表 -->
+          <section class="detail-section">
+            <h5 class="section-title">
+              <i class="fa-solid fa-music"></i>Unit 表演
+              <span v-if="detailItem.unit.length" class="section-count">{{ detailItem.unit.length }}</span>
+            </h5>
+            <ol v-if="detailItem.unit.length" class="unit-list">
+              <li
+                v-for="(unitItem, unitIndex) in detailItem.unit.map(getUnitDetail)"
+                :key="`detail-unit-${unitIndex}`"
+                class="unit-row"
               >
-                <div
-                  v-for="(unitItem, unitIndex) in detailItem.unit"
-                  :key="`detail-unit-${unitIndex}`"
-                  class="px-3 py-2"
-                  :class="unitIndex < detailItem.unit.length - 1 ? 'border-bottom' : ''"
-                >
-                  <div class="text-break">
-                    {{ formatUnitDetailLine(unitItem) }}
-                  </div>
-                </div>
-              </div>
-              <div v-else class="form-control-plaintext border rounded px-3 py-2 bg-light">
-                -
-              </div>
-            </div>
-          </div>
+                <span class="unit-index">{{ unitIndex + 1 }}</span>
+                <span class="unit-name">{{ unitItem.name }}</span>
+                <span class="unit-tags">
+                  <span v-if="unitItem.posLabel" class="unit-tag" :class="`pos-${unitItem.posKind}`">
+                    {{ unitItem.posLabel }}
+                  </span>
+                  <span class="unit-tag" :class="`type-${unitItem.type}`">{{ unitItem.typeLabel }}</span>
+                </span>
+              </li>
+            </ol>
+            <p v-else class="detail-empty">暂无 Unit 记录</p>
+          </section>
 
-          <div class="form-group row mb-2 align-items-center">
-            <label class="col-sm-3 col-form-label text-start">完整视频回放</label>
-            <div class="col-sm-9">
-              <a
-                :href="detailItem.url ? 'https://www.bilibili.com/video/' + detailItem.url : null"
+          <!-- 视频 -->
+          <section class="detail-section">
+            <h5 class="section-title"><i class="fa-solid fa-circle-play"></i>视频</h5>
+            <div class="video-links">
+              <component
+                :is="detailItem.url ? 'a' : 'div'"
+                :href="detailItem.url ? 'https://www.bilibili.com/video/' + detailItem.url : undefined"
                 target="_blank"
-                class="btn btn-sm"
-                :class="detailItem.url ? 'btn-primary' : 'btn-secondary disabled'"
-                :tabindex="!detailItem.url ? -1 : null"
-                :aria-disabled="!detailItem.url"
+                rel="noopener"
+                class="video-card video-replay"
+                :class="{ 'is-disabled': !detailItem.url }"
               >
-                完整视频回放
-              </a>
-            </div>
-          </div>
+                <span class="video-icon"><i class="fa-solid fa-film"></i></span>
+                <span class="video-text">
+                  <strong>完整视频回放</strong>
+                  <small>{{ detailItem.url || '暂无回放' }}</small>
+                </span>
+                <i v-if="detailItem.url" class="fa-solid fa-arrow-up-right-from-square video-arrow"></i>
+              </component>
 
-          <div class="form-group row mb-2 align-items-center">
-            <label class="col-sm-3 col-form-label text-start">小周cut视频</label>
-            <div class="col-sm-9">
-              <a
-                :href="detailItem.cut_url ? 'https://www.bilibili.com/video/' + detailItem.cut_url : null"
+              <component
+                :is="detailItem.cut_url ? 'a' : 'div'"
+                :href="detailItem.cut_url ? 'https://www.bilibili.com/video/' + detailItem.cut_url : undefined"
                 target="_blank"
-                class="btn btn-sm"
-                :class="detailItem.cut_url ? 'btn-warning' : 'btn-secondary disabled'"
-                :tabindex="!detailItem.cut_url ? -1 : null"
-                :aria-disabled="!detailItem.cut_url"
+                rel="noopener"
+                class="video-card video-cut"
+                :class="{ 'is-disabled': !detailItem.cut_url }"
               >
-                小周cut视频
-              </a>
+                <span class="video-icon"><i class="fa-solid fa-star"></i></span>
+                <span class="video-text">
+                  <strong>小周cut视频</strong>
+                  <small>{{ detailItem.cut_url || '暂无cut' }}</small>
+                </span>
+                <i v-if="detailItem.cut_url" class="fa-solid fa-arrow-up-right-from-square video-arrow"></i>
+              </component>
             </div>
-          </div>
-        </template>
+          </section>
+        </div>
       </Modal>
   </div>
 </template>
@@ -1475,6 +1444,327 @@ const canShowLiveButton = (startDateLike) => {
 .stage-title {
   font-weight: 600;
   color: var(--c-text);
+}
+
+/* ---------- 详情弹框 ---------- */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detail-hero {
+  position: relative;
+  padding: 20px 22px;
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(242, 183, 5, 0.22), transparent 55%),
+    linear-gradient(135deg, var(--c-accent-soft), var(--c-surface-2));
+  border: 1px solid rgba(242, 183, 5, 0.25);
+  overflow: hidden;
+}
+
+.detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.detail-session {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--c-ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-chip {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--c-accent-ink);
+  border: 1px solid rgba(242, 183, 5, 0.35);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.detail-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--c-text);
+  word-break: break-word;
+}
+
+.detail-subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--c-text-2);
+}
+
+.detail-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--c-text-2);
+}
+
+.detail-info {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.info-item {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-2);
+  min-width: 0;
+}
+
+.info-item dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text-3);
+}
+
+.info-item dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c-text);
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.section-title > i {
+  color: var(--c-accent-strong);
+}
+
+.section-count {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  color: var(--c-text-2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.unit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.unit-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+}
+
+.unit-row + .unit-row {
+  border-top: 1px solid var(--c-border);
+}
+
+.unit-row:hover {
+  background: var(--c-surface-2);
+}
+
+.unit-index {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--c-accent-soft);
+  color: var(--c-accent-ink);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.unit-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.unit-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+  max-width: 55%;
+}
+
+.unit-tag {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--c-surface-2);
+  color: var(--c-text-2);
+}
+
+.unit-tag.pos-pos { background: #ece9f7; color: var(--c-ink); }
+.unit-tag.pos-solo { background: var(--c-ink); color: #fff; }
+.unit-tag.pos-support { background: #e0f2fe; color: #0369a1; white-space: normal; }
+
+.unit-tag.type-birthday { background: #fce7f3; color: #be185d; }
+.unit-tag.type-graduation { background: #f3e8ff; color: #7e22ce; }
+.unit-tag.type-mvp,
+.unit-tag.type-todaymvp,
+.unit-tag.type-b50 { background: var(--c-accent-soft); color: var(--c-accent-ink); }
+.unit-tag.type-yueyaoqu,
+.unit-tag.type-election { background: #dcfce7; color: #15803d; }
+.unit-tag.type-encore { background: #ffedd5; color: #c2410c; }
+
+.detail-empty {
+  margin: 0;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--c-border-strong);
+  text-align: center;
+  font-size: 14px;
+  color: var(--c-text-3);
+}
+
+.video-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.video-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
+  text-decoration: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+a.video-card:hover {
+  border-color: var(--c-border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+  color: var(--c-text);
+}
+
+.video-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.video-replay .video-icon { background: var(--c-ink); color: #fff; }
+.video-cut .video-icon { background: var(--c-accent); color: var(--c-ink); }
+
+.video-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.video-text strong {
+  font-size: 14px;
+}
+
+.video-text small {
+  font-size: 12px;
+  color: var(--c-text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.video-arrow {
+  font-size: 12px;
+  color: var(--c-text-3);
+}
+
+.video-card.is-disabled {
+  background: var(--c-surface-2);
+  cursor: not-allowed;
+}
+
+.video-card.is-disabled .video-icon {
+  background: var(--c-border-strong);
+  color: #fff;
+}
+
+.video-card.is-disabled strong {
+  color: var(--c-text-3);
+}
+
+@media (max-width: 576px) {
+  .detail-hero {
+    padding: 16px;
+  }
+
+  .detail-title {
+    font-size: 18px;
+  }
+
+  .detail-info {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .detail-info .info-item:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .video-links {
+    grid-template-columns: 1fr;
+  }
+
+  .unit-row {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  .unit-tags {
+    max-width: none;
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 38px;
+  }
 }
 
 @media (min-width: 768px) {
