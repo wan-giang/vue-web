@@ -9,7 +9,7 @@ const year = new Date().getFullYear()
     <div class="footer-inner">
       <div class="footer-brand">
         <div class="footer-name">小星云之家 <span class="footer-beta">内测中</span></div>
-        <p class="footer-desc">由 SNH48-周童玥 的粉丝建立的非官方应援站。</p>
+        <p class="footer-desc">由 SNH48-周童玥 的粉丝建立的，以介绍、宣传周童玥为主的网站。</p>
         <p class="footer-code">
           <i class="fa-solid fa-comment-dots"></i>
           神秘代码：<strong>{{ SECRET_CODE }}</strong>
