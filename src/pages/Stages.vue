@@ -593,6 +593,21 @@ const getStageCodeLabel = (stageCode) => {
   return map[stageCode] || stageCode || '-'
 }
 
+const stageLogoMap = {
+  'HJ-B': 'hj_lg.png',
+  'HJ-C': 'hj_lg.png',
+  MX: 'mx_lg.png',
+  XII: 'xii_lg.png',
+  ITL: 'itl_lg.png',
+  '11': '11_lg.png',
+  '48Hz': '48hz_lg.png'
+}
+
+const getStageLogo = (stageCode) => {
+  const file = stageLogoMap[String(stageCode || '').trim()]
+  return file ? `${import.meta.env.BASE_URL}lg/${file}` : ''
+}
+
 const getVenueLabel = (venue) => {
   const normalizedVenue = String(venue || '').trim()
   const map = {
@@ -746,7 +761,7 @@ const canShowLiveButton = (startDateLike) => {
                 </div>
 
                 <!-- 中间：标题 -->
-                <div class="flex-grow-1 d-flex justify-content-center justify-content-md-start align-items-center text-center text-md-start">
+                <div class="stage-title-col flex-grow-1 d-flex justify-content-center justify-content-md-start align-items-center text-center text-md-start">
                   <div>
                     <div class="stage-title">{{ splitTitle(item.title).mainLines[0] }}</div>
                     <div
@@ -766,7 +781,7 @@ const canShowLiveButton = (startDateLike) => {
                 </div>
 
                 <!-- 右侧：两个按钮 -->
-                <div class="d-flex justify-content-center justify-content-md-end align-items-center gap-2">
+                <div class="stage-actions d-flex justify-content-center justify-content-md-end align-items-center gap-2">
                   <!-- 判断 group 是否为“今日公演”，且是否距离开场30分钟之内，然后提供直播入口 -->
                   <template v-if="group === '今日公演' && canShowLiveButton(item.date)">
                     <!-- SNH 或 time 为空 -->
@@ -1117,7 +1132,8 @@ const canShowLiveButton = (startDateLike) => {
       <Modal v-model="showDetailModal" title="公演详情" cancel-text="关闭" :show-confirm="false">
         <div v-if="detailItem" class="detail">
           <!-- 头部：场次 + 标题 -->
-          <header class="detail-hero">
+          <header class="detail-hero" :class="{ 'has-logo': getStageLogo(detailItem.stage_code) }">
+            <div class="detail-hero-text">
             <div class="detail-badges">
               <span class="detail-session">
                 {{ detailItem.session !== '0' ? `第 ${detailItem.session} 场` : '不计入场次' }}
@@ -1141,6 +1157,14 @@ const canShowLiveButton = (startDateLike) => {
                 <br v-if="lineIndex < splitTitle(detailItem.title).noteLines.length - 1" />
               </template>
             </p>
+            </div>
+            <img
+              v-if="getStageLogo(detailItem.stage_code)"
+              :src="getStageLogo(detailItem.stage_code)"
+              :alt="`${getStageCodeLabel(detailItem.stage_code)} logo`"
+              class="detail-logo"
+              decoding="async"
+            />
           </header>
 
           <!-- 基本信息 -->
@@ -1429,6 +1453,8 @@ const canShowLiveButton = (startDateLike) => {
 .stage-meta {
   min-width: 120px;
   padding-right: 4px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .stage-session {
@@ -1439,6 +1465,26 @@ const canShowLiveButton = (startDateLike) => {
 
 .stage-meta :deep(*) {
   font-size: 13px;
+}
+
+.stage-title-col {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.stage-actions .btn {
+  white-space: nowrap;
+}
+
+.stage-actions {
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .stage-actions {
+    flex-wrap: wrap;
+  }
 }
 
 .stage-title {
@@ -1462,6 +1508,26 @@ const canShowLiveButton = (startDateLike) => {
     linear-gradient(135deg, var(--c-accent-soft), var(--c-surface-2));
   border: 1px solid rgba(242, 183, 5, 0.25);
   overflow: hidden;
+}
+
+.detail-hero.has-logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.detail-hero-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.detail-logo {
+  flex-shrink: 0;
+  width: 150px;
+  height: 100px;
+  object-fit: contain;
+  margin: -8px -6px -8px 0;
+  filter: drop-shadow(0 4px 10px rgba(28, 25, 23, 0.12));
 }
 
 .detail-badges {
@@ -1740,6 +1806,12 @@ a.video-card:hover {
 
   .detail-title {
     font-size: 18px;
+  }
+
+  .detail-logo {
+    width: 96px;
+    height: 64px;
+    margin: 0;
   }
 
   .detail-info {
