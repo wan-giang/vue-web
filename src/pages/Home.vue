@@ -147,7 +147,7 @@ function getCategory(item, date) {
   const day = normalizeDay(date)
   const now = today.value
 
-  if (day.isSame(now, 'day')) {
+  if (day.isSame(now, 'day') || isOngoing(item)) {
     return item.is_stage ? 'today-stage' : 'today-schedule'
   }
 
@@ -285,19 +285,29 @@ function getDatePhase(dateLike) {
   return 'today'
 }
 
+// 演出未标记结束（is_end === false）时，即使已过零点也按“今日”处理，
+// 继续显示直播按钮，与公演页“今日公演”的判断保持一致
+function isOngoing(item) {
+  return item?.is_end === false && getDatePhase(item.date) === 'past'
+}
+
+function getItemPhase(item) {
+  return isOngoing(item) ? 'today' : getDatePhase(item.date)
+}
+
 function shouldShowReplayButtons(item) {
-  return getDatePhase(item.date) === 'past'
+  return getItemPhase(item) === 'past'
 }
 
 function shouldShowLiveButton(item) {
-  const phase = getDatePhase(item.date)
+  const phase = getItemPhase(item)
   if (phase === 'future') return true
   if (phase === 'today') return true
   return false
 }
 
 function getLiveButtonState(item) {
-  const phase = getDatePhase(item.date)
+  const phase = getItemPhase(item)
 
   if (phase === 'today' && item.is_stage) {
     return canShowLiveButton(item.date) && !!getLiveUrlByVenue(item.time) ? 'watch' : 'none'
@@ -447,7 +457,7 @@ onMounted(() => {
                 <span class="legend-item"><i class="dot tag-today-stage"></i>今日公演</span>
                 <span class="legend-item"><i class="dot tag-today-schedule"></i>今日行程</span>
                 <span class="legend-item"><i class="dot tag-past-stage"></i>过去公演</span>
-                <span class="legend-item"><i class="dot tag-past-schedule"></i>过去日程</span>
+                <span class="legend-item"><i class="dot tag-past-schedule"></i>过去行程</span>
                 <span class="legend-item"><i class="dot tag-future-stage"></i>将来公演</span>
                 <span class="legend-item"><i class="dot tag-future-schedule"></i>将来行程</span>
               </div>
