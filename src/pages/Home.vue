@@ -65,6 +65,12 @@ const socialLinks = [
     description: '记录厅B站（公演切片、直播回放）',
     className: 'social-bilibili',
   },
+    {
+    name: '周童玥应援会官网',
+    href: 'https://ztyyyh.itsbok.com',
+    description: '周童玥应援会官网',
+    className: 'social-website',
+  },
 ]
 
 const socialLinkGroups = computed(() => {
@@ -941,6 +947,10 @@ onMounted(() => {
 
 .social-card.social-xhs::before {
   background: linear-gradient(180deg, #ef4444, #be123c);
+}
+
+.social-card.social-website::before {
+  background: linear-gradient(180deg, #facc15, #eab308);
 }
 
 .social-name {
