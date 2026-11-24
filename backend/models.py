@@ -31,6 +31,18 @@ class Stage(db.Model):
     unit = db.Column(db.JSON)
 
 
+class Unit(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(100), nullable=False)
+    stage_code = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    url = db.Column(db.String(255))
+    cut_url = db.Column(db.String(255))
+    details = db.Column(db.JSON)
+    img = db.Column(db.Text)
+    date = db.Column(db.Integer, nullable=False)
+
+
 class Teammate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     snh_id = db.Column(db.Integer)

@@ -23,6 +23,18 @@ stage_model = api.model('Stage', {
     'unit': fields.Raw(description='演出unit信息，JSON格式')
 })
 
+unit_model = api.model('Unit', {
+    'id': fields.String(description='unit id'),
+    'type': fields.String(required=True, description='unit类型'),
+    'stage_code': fields.String(required=True, description='演出代码'),
+    'title': fields.String(required=True, description='unit名称'),
+    'url': fields.String(description='完整回放链接'),
+    'cut_url': fields.String(description='cut回放链接'),
+    'details': fields.Raw(description='unit详情，JSON格式'),
+    'img': fields.String(description='unit图片链接'),
+    'date': fields.String(required=True, description='unit日期，格式 YYYYMMDD')
+})
+
 teammate_model = api.model('Teammate', {
     'snh_id': fields.String(required=True, description='SNH48官网id'),
     'name': fields.String(required=True, description='姓名'),
