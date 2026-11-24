@@ -8,7 +8,7 @@ const year = new Date().getFullYear()
   <footer class="app-footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <div class="footer-name">小星云之家 <span class="footer-beta">内测中</span></div>
+        <div class="footer-name">小星云之家 <span class="footer-beta">Beta</span></div>
         <p class="footer-desc">由 SNH48-周童玥 的粉丝建立的，以介绍、宣传周童玥为主的网站。</p>
         <p class="footer-code">
           <i class="fa-solid fa-comment-dots"></i>
@@ -56,12 +56,15 @@ const year = new Date().getFullYear()
 
 .footer-beta {
   margin-left: 6px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 2px 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 7px;
   border-radius: 999px;
   color: var(--c-accent-ink);
   background: var(--c-accent-soft);
+  border: 1px solid rgba(242, 183, 5, 0.35);
   vertical-align: middle;
 }
 
