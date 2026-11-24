@@ -424,9 +424,9 @@ onMounted(() => {
   position: relative;
   border-radius: 18px;
   overflow: hidden;
-  border: 1px solid var(--c-border);
+  border: 3px solid var(--c-accent);
   box-shadow: var(--shadow-md);
-  background: #111;
+  background: var(--c-accent-soft);
   max-width: 640px;
   width: 100%;
 }
