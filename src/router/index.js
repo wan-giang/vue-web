@@ -4,6 +4,7 @@ import Home from '@/pages/Home.vue'
 import Portrait from '@/pages/Portrait.vue'
 import Baike from '@/pages/Baike.vue'
 import Stages from '@/pages/Stages.vue'
+import Units from '@/pages/Units.vue'
 // import Fun from '@/pages/Fun.vue'
 // import Relation from '@/pages/Relation.vue'
 import Events from '@/pages/Events.vue'
@@ -18,6 +19,7 @@ const routes = [
   { path: '/baike', name: 'Baike', component: Baike },
   { path: '/portrait', name: 'Portrait', component: Portrait },
   { path: '/stages', name: 'Stages', component: Stages },
+  { path: '/units', name: 'Units', component: Units },
   // { path: '/fun', name: 'Fun', component: Fun },
   // { path: '/relation', name: 'Relation', component: Relation },
   { path: '/events', name: 'Events', component: Events },

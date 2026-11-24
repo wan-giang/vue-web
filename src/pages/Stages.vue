@@ -4,6 +4,7 @@ import ZonedDateTime from '@/components/ZonedDateTime.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import Modal from '@/components/Modal.vue'
 import { useApi } from '@/composables/fetch'
+import { getStageCodeLabel, getStageLogo } from '@/utils/stageMeta'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
@@ -575,37 +576,6 @@ const getTypeLabel = (type) => {
     'Others': '其它（特殊公演或非公演）'
   }
   return map[type] || type || '-'
-}
-
-const getStageCodeLabel = (stageCode) => {
-  const map = {
-    MX: '命运的X号',
-    'HJ-B': '幻镜-B版',
-    XII: '代号XII 2.0',
-    'HJ-C': '幻镜-C版',
-    ITL: 'INTO THE LIGHT',
-    11: '1&1 Anyone',
-    '48Hz': '48Hz',
-    SJHS: '三角函数',
-    FX: 'Fire X',
-    SP: '其它（特殊公演或非公演）'
-  }
-  return map[stageCode] || stageCode || '-'
-}
-
-const stageLogoMap = {
-  'HJ-B': 'hj_lg.png',
-  'HJ-C': 'hj_lg.png',
-  MX: 'mx_lg.png',
-  XII: 'xii_lg.png',
-  ITL: 'itl_lg.png',
-  '11': '11_lg.png',
-  '48Hz': '48hz_lg.png'
-}
-
-const getStageLogo = (stageCode) => {
-  const file = stageLogoMap[String(stageCode || '').trim()]
-  return file ? `${import.meta.env.BASE_URL}lg/${file}` : ''
 }
 
 const getVenueLabel = (venue) => {

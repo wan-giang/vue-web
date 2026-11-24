@@ -3,6 +3,7 @@ export const navItems = [
   { to: '/baike', label: '小周百科', icon: 'fa-solid fa-book-open' },
   { to: '/portrait', label: '公式照', icon: 'fa-solid fa-camera-retro' },
   { to: '/stages', label: '公演及活动', icon: 'fa-solid fa-masks-theater' },
+  { to: '/units', label: '舞台和MV', icon: 'fa-solid fa-film' },
   { to: '/events', label: '大事年表', icon: 'fa-solid fa-timeline' },
   { to: '/about', label: '关于本站', icon: 'fa-solid fa-circle-info' },
   // { to: '/weibo', label: '微博', icon: 'fa-brands fa-weibo' },

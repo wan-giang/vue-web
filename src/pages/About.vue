@@ -33,8 +33,9 @@ const features = [
       <div class="statement surface">
         <ul>
           <li>本站为周童玥的粉丝建立并管理，<strong>非周童玥个人官方网站</strong>。</li>
+          <li>除特别注明来源的内容外，本站所有的图片、视频、音频等内容均来源于SNH48官方网站（SNH48.com）及SNH48官方社交平台。所有相关内容的版权均归原作者所有。</li>
           <li>本站仅提供周童玥相关的信息，不提供任何站内互动渠道。</li>
-          <li>若对本站有任何意见或建议，请加入神秘代码：<strong>{{ SECRET_CODE }}</strong>。</li>
+          <li>若对本站有任何意见或建议，或是有内容版权问题，请加入神秘代码：<strong>{{ SECRET_CODE }}</strong>，以联系网站管理员。</li>
           <li>若要与周童玥互动，请前往口袋48 App，在周童玥的口袋房间和她互动。</li>
         </ul>
       </div>

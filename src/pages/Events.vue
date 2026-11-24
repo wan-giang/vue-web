@@ -57,6 +57,31 @@ const filteredTimelineItems = computed(() => {
 // 调用api
 const { apiFetch } = useApi()
 
+// ===== 出道天数（按北京时间日期计算，出道当天计为第 1 天）=====
+const DEBUT_DATE = Date.UTC(2023, 4, 2)
+const getBeijingTodayUTC = () => {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(new Date())
+  const get = (type) => Number(parts.find(p => p.type === type).value)
+  return Date.UTC(get('year'), get('month') - 1, get('day'))
+}
+const debutDays = Math.floor((getBeijingTodayUTC() - DEBUT_DATE) / 86400000) + 1
+
+// ===== 已完成公演场次：is_end 为 true 的条目中 session 最大值 =====
+const stageCount = ref(null)
+const loadStageCount = async () => {
+  try {
+    const { ok, data } = await apiFetch('/stages')
+    if (!ok || !Array.isArray(data)) return
+    stageCount.value = data
+      .filter(item => item.is_end === true)
+      .reduce((max, item) => Math.max(max, parseInt(item.session, 10) || 0), 0)
+  } catch (e) {
+    console.error('公演场次加载失败', e)
+  }
+}
+
 const loadEvents = async () => {
   isLoading.value = true
   try {
@@ -88,6 +113,7 @@ const loadEvents = async () => {
 
 onMounted(() => {
   loadEvents()
+  loadStageCount()
 })
 </script>
 
@@ -100,20 +126,20 @@ onMounted(() => {
         description="除特别注明外，所有图片均来自 SNH48 公演直播截图，或由 SNH48 官方微博发布。"
       />
 
-      <section class="featured surface">
-        <div class="featured-head">
-          <span class="featured-badge"><i class="fa-solid fa-play me-1"></i>精选视频</span>
-          <h2 class="featured-title">Team SII《48Hz》首演 周童玥Unit《Up To You（真相背后）》</h2>
+      <section class="stats">
+        <div class="stat-card surface">
+          <div class="stat-label"><i class="fa-regular fa-calendar me-1"></i>出道至今</div>
+          <div class="stat-value">{{ debutDays }}<span class="stat-unit">天</span></div>
+          <div class="stat-note">自 2023年5月2日 出道</div>
         </div>
-      <div class="video-wrapper">
-        <iframe
-          src="https://player.bilibili.com/player.html?isOutside=true&aid=117416856196521&bvid=BV1YSpu6gEHF&cid=42650371492&p=1"
-          scrolling="no"
-          frameborder="0"
-          allowfullscreen
-        ></iframe>
-      </div>
-        <p class="featured-note">*视频来源于B站。相关推荐视频列表由B站自动生成，与本站无关，亦不代表本站立场。</p>
+        <div class="stat-card surface">
+          <div class="stat-label"><i class="fa-solid fa-masks-theater me-1"></i>已完成公演</div>
+          <div class="stat-value">
+            <template v-if="stageCount !== null">{{ stageCount }}<span class="stat-unit">场</span></template>
+            <span v-else class="spinner-border spinner-border-sm"></span>
+          </div>
+          <div class="stat-note">按已结束公演的最大场次计</div>
+        </div>
       </section>
 
       <section class="timeline-section">
@@ -207,50 +233,57 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.featured {
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
   max-width: 720px;
   margin: 0 auto;
-  padding: 16px;
 }
 
-.featured-head {
+.stat-card {
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 6px;
 }
 
-.featured-badge {
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: var(--c-ink);
-  color: #fff;
-  font-size: 12px;
+.stat-label {
+  font-size: 14px;
   font-weight: 700;
+  color: var(--c-text-2);
 }
 
-.featured-title {
-  margin: 0;
-  font-size: clamp(17px, 2.4vw, 22px);
+.stat-value {
+  font-size: clamp(32px, 6vw, 48px);
   font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
 }
 
-.featured-note {
-  margin: 12px 0 0;
+.stat-unit {
+  margin-left: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--c-text-2);
+}
+
+.stat-note {
   font-size: 12px;
   color: var(--c-text-3);
 }
 
-.video-wrapper {
-  width: 100%;
-  margin: 0 auto;
-  aspect-ratio: 16 / 9;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: #000;
+@media (max-width: 479.98px) {
+  .stats {
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 16px 10px;
+  }
 }
-.video-wrapper iframe { width: 100%; height: 100%; border: none; }
 
 .timeline-section {
   width: 100%;
