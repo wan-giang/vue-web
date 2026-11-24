@@ -68,15 +68,13 @@ const getBeijingTodayUTC = () => {
 }
 const debutDays = Math.floor((getBeijingTodayUTC() - DEBUT_DATE) / 86400000) + 1
 
-// ===== 已完成公演场次：is_end 为 true 的条目中 session 最大值 =====
+// ===== 已完成公演场次：后端直接返回 is_end 为 true 的最大 session =====
 const stageCount = ref(null)
 const loadStageCount = async () => {
   try {
-    const { ok, data } = await apiFetch('/stages')
-    if (!ok || !Array.isArray(data)) return
-    stageCount.value = data
-      .filter(item => item.is_end === true)
-      .reduce((max, item) => Math.max(max, parseInt(item.session, 10) || 0), 0)
+    const { ok, data } = await apiFetch('/stage/finish_count')
+    if (!ok) return
+    stageCount.value = Number(data?.count) || 0
   } catch (e) {
     console.error('公演场次加载失败', e)
   }

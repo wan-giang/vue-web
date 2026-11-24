@@ -4,11 +4,21 @@ import logging
 from flask import g
 from flask import request
 from flask_restx import Resource
+from sqlalchemy import func
 
 from auth_utils import get_client_ip, token_required
 from extensions import db, ns
 from models import Stage
 from schemas import stage_model
+
+
+@ns.route('/stage/finish_count')
+class StageFinishCount(Resource):
+    @ns.doc(security=None)
+    def get(self):
+        """已结束（is_end 为 true）公演中最大的场次数"""
+        count = db.session.query(func.max(Stage.session)).filter(Stage.is_end.is_(True)).scalar()
+        return {'count': count or 0}, 200
 
 
 @ns.route('/stages')
