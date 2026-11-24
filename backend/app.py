@@ -8,6 +8,7 @@ from routes import health_routes
 from routes import knowledge_routes
 from routes import portrait_routes
 from routes import stage_routes
+from routes import unit_routes
 from routes import teammate_routes
 
 
