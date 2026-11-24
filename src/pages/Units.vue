@@ -24,6 +24,17 @@ const formatDate = (date) => {
   return /^\d{8}$/.test(s) ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}` : s
 }
 
+// 转换日期格式
+const formatCNDateFromYYYYMMDD = (dateStr) => {
+  if (!dateStr || dateStr.length !== 8) return ''
+
+  const y = dateStr.slice(0, 4)
+  const m = parseInt(dateStr.slice(4, 6), 10)
+  const d = parseInt(dateStr.slice(6, 8), 10)
+
+  return `${y}年${m}月${d}日`
+}
+
 const isMv = (item) => String(item.type || '').trim().toLowerCase() === 'mv'
 
 // 优先用 img，没有则回退到所属公演 logo
@@ -157,7 +168,7 @@ onUnmounted(() => {
                 <div class="unit-title-col">
                   <div class="unit-title">{{ item.title }}</div>
                   <div class="unit-date text-muted small mt-1">
-                    <span>{{ formatDate(item.date) }}</span>
+                    <span>发布日期：{{ formatCNDateFromYYYYMMDD(item.date) }}</span>
                     <span
                       v-if="getNotes(item)"
                       class="note-tip"
@@ -211,7 +222,7 @@ onUnmounted(() => {
                   <div class="unit-title-col">
                     <div class="unit-title">{{ item.title }}</div>
                     <div class="unit-date text-muted small mt-1">
-                    <span>{{ formatDate(item.date) }}</span>
+                    <span>首演：{{ formatCNDateFromYYYYMMDD(item.date) }}</span>
                     <span
                       v-if="getNotes(item)"
                       class="note-tip"
