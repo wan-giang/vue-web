@@ -376,6 +376,23 @@ onUnmounted(() => {
   --bs-list-group-border-width: 0;
 }
 
+/* 电脑端一行两个 */
+@media (min-width: 992px) {
+  .unit-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .unit-list .list-group-item {
+    display: flex;
+    align-items: center;
+  }
+
+  .unit-list .unit-row {
+    width: 100%;
+  }
+}
+
 .unit-list .list-group-item {
   border: 1px solid var(--c-border) !important;
   border-radius: var(--radius-md) !important;
