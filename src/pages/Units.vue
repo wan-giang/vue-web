@@ -93,7 +93,8 @@ const unitGroups = computed(() => {
       label: getStageCodeLabel(code),
       items: items.sort(byDateDesc)
     }))
-    .sort((a, b) => byDateDesc(a.items[0], b.items[0]))
+    // 公演之间按各组最早（首个）unit 日期降序：首演越晚的公演越靠前
+    .sort((a, b) => byDateDesc(a.items[a.items.length - 1], b.items[b.items.length - 1]))
 })
 
 const unitCount = computed(() => unitGroups.value.reduce((sum, g) => sum + g.items.length, 0))
