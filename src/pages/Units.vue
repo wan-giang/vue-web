@@ -38,7 +38,12 @@ const formatCNDateFromYYYYMMDD = (dateStr) => {
 const isMv = (item) => String(item.type || '').trim().toLowerCase() === 'mv'
 
 // 优先用 img，没有则回退到所属公演 logo
-const getItemImg = (item) => resolvePublicImg(item.img) || getStageLogo(item.stage_code)
+// img 以 unit_ 开头的放在 public/unit_imgs/ 下
+const getItemImg = (item) => {
+  const img = String(item.img || '').trim()
+  const path = img.startsWith('unit_') ? `unit_imgs/${img}` : img
+  return resolvePublicImg(path) || getStageLogo(item.stage_code)
+}
 
 const getVideoUrl = (url) => {
   const value = String(url || '').trim()
